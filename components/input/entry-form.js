@@ -64,7 +64,7 @@ export const entryForm = ({ form = 'factura-esp', year = new Date().getFullYear(
     form: true,
     title: FORMS[form],
     headerAction: `<button type="button" class="btn btn--ghost btn--${accent}" data-close><span class="btn__label">Cancelar</span></button>`,
-    body: `<div class="form--${accent} form--tinted" data-entry="${gasto ? 'gasto' : 'factura'}" style="display:flex;flex-direction:column;gap:var(--space-20)">${fields}</div>`,
+    body: `<div class="form form--${accent} form--tinted" data-entry="${gasto ? 'gasto' : 'factura'}">${fields}</div>`,
     actions: `<button type="button" class="btn btn--${accent}" data-close><span class="btn__label">Guardar</span>${icon('save', { size: 'md' })}</button>`,
   };
 };

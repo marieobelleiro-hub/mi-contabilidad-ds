@@ -1,0 +1,44 @@
+/* ==========================================================================
+   Menu  ·  .menu  (dropdown menu: a list of options under a trigger)
+   NOT IN THE APP YET. The app's dropdowns (% de IVA, Categoría IRPF) use the
+   browser's own menu (<select>): its open list is drawn by the browser or the
+   phone's picker and can't be styled. This menu is ready for a custom dropdown.
+
+   Kinds:    text   <ul class="menu" role="listbox"> <li class="menu__item" role="option" aria-selected>
+             radio / checkbox   <fieldset class="menu"> <label class="menu__item"><input type="radio|checkbox"> …
+   States:   selected (text: tint + medium · radio/checkbox: checked) · default · hover · disabled · focus
+   Colour:   field--primary / field--attention on the menu or a wrapper (tint, controls)
+   ========================================================================== */
+.menu{
+  display:flex;
+  flex-direction:column;
+  min-width:var(--menu-min-w);
+  max-height:var(--menu-max-h);
+  overflow-y:auto;
+  margin:0;
+  padding:var(--space-4) 0;
+  border:none;
+  list-style:none;
+  background:var(--surface);
+  box-shadow:var(--shadow-md);
+  font-family:var(--font-sans);
+  font-size:var(--text-14);
+  color:var(--text);
+}
+.menu__item{
+  display:flex;
+  align-items:center;
+  gap:var(--space-12);
+  min-height:var(--menu-item-h);
+  margin:0;
+  padding:0 var(--space-12);
+  cursor:pointer;
+}
+.menu__item input{width:var(--check-size);height:var(--check-size);margin:0;flex-shrink:0;accent-color:var(--field-accent, var(--primary));cursor:pointer}
+.menu__item:is(:hover,.is-hover){background:var(--fill-hover)}
+.menu__item[aria-selected="true"]{background:var(--field-tint, var(--primary-tint));font-weight:var(--weight-medium)}
+.menu__item:is([aria-disabled="true"],:has(input:disabled)){background:none;color:var(--disabled);cursor:not-allowed}
+.menu__item:is([aria-disabled="true"],:has(input:disabled)) input{cursor:not-allowed}
+.menu__item input:focus-visible{outline:none}   /* the ring goes around the whole option */
+.menu__item:is(:focus-visible,.is-focus,:has(input:focus-visible)){outline:var(--border-thick) solid var(--focus);outline-offset:calc(-1 * var(--border-thick));box-shadow:inset 0 0 0 calc(var(--border-thick) + var(--border-thin)) var(--black)}
+@media (max-width:1023px){.menu{font-size:var(--text-16)}}

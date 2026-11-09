@@ -1,0 +1,84 @@
+import { Meta, Canvas, Controls, Source } from '@storybook/addon-docs/blocks';
+import * as ListStories from './menu.stories.js';
+import { Source as CssSource } from '@storybook/addon-docs/blocks';
+import { cssSnippet } from '../../foundations/css-snippet.js';
+import alsoCss0 from '../input/input.css?raw';
+import alsoCss1 from '../selectors/selectors.css?raw';
+import ownCss from './menu.css?raw';
+
+<Meta of={ListStories} />
+
+# Lists & menus
+
+Components that **put several inputs or options together**. Three components, the same as in Figma:
+
+| Component | What it is | In the app |
+|---|---|---|
+| [Form](#form) | a list of fields, 20px apart | the mobile forms Nueva factura · Nuevo gasto (inside the full-screen <a href="./?path=/docs/app-components-dialog--dialog#mobile-forms" target="_top">Dialog</a>) |
+| [Selector group](#selector-group) | checkboxes, radios or choice cards under one legend | Guardar copia .html (choice cards) |
+| [Menu](#menu) | the open list of a dropdown: text, radio or checkbox options | **not yet**: see the note |
+
+## Form
+
+The fields of a form in their order, 20px apart (`form`), in the colour of the section (`form--primary` / `form--attention`). **Tinted** is for the mobile forms: they fill the screen with no card around them, so the tint shows where to type. In the app a form always lives inside the full-screen dialog, with its title, Cancelar and Guardar.
+
+<Canvas of={ListStories.Form} />
+<Controls of={ListStories.Form} />
+
+## Selector group
+
+Several selectors under one title (`<fieldset>` + `<legend>`): **checkboxes** when you can choose several, **radios** or **choice cards** when you choose one. The legend can be hidden; it stays for screen readers. The options are the real ones of the app (% de IVA, Categoría IRPF, the two versions of Guardar copia .html).
+
+<Canvas of={ListStories.SelectorGroup} />
+<Controls of={ListStories.SelectorGroup} />
+
+## Menu
+
+> **Not in the app yet.** The app's dropdowns (% de IVA, Categoría IRPF) use the **browser's own menu**: the open list of a `<select>` is drawn by the browser, or by the phone's picker, and can't be styled. This menu is ready for when the app needs a custom dropdown. The only custom menu in the app today is the mobile <a href="./?path=/docs/app-components-tab--tab" target="_top">Tab · selector</a>, which uses the same panel (white, `--shadow-md`).
+
+Three kinds of option, the same as a selector group: **text** (one choice, the selected one tinted), **radio** (one choice) and **checkbox** (several). Try it: click an option, or use ↑ ↓ and Enter.
+
+<Canvas of={ListStories.Menu} />
+<Controls of={ListStories.Menu} />
+
+**States** of an option:
+
+<Canvas of={ListStories.MenuStates} sourceState="none" />
+
+**Under a dropdown.** The menu opens 4px under its field (`--menu-gap`), as wide as the field:
+
+<Canvas of={ListStories.MenuInContext} sourceState="none" />
+
+## Spec
+
+| | Value |
+|---|---|
+| Form | `form` · `--space-20` between fields · colour `form--primary` / `--attention` · `form--tinted` |
+| Selector group | `check-group` (8px gap) · `choice-group` (8px gap) · legend Sans 14 |
+| Menu · panel | `--surface` · `--shadow-md` · 4px top and bottom · min width `--menu-min-w` 240px · taller than `--menu-max-h` 320px: scrolls |
+| Menu · option | `--menu-item-h` 40px (the height of a field) · 12px sides · Sans 14 (16 on mobile) · radio / checkbox 20px, 12px before the text |
+| Hover | `--fill-hover` |
+| Selected (text) | `--field-tint` + medium weight |
+| Disabled | `--disabled` text, no hover |
+| Focus | yellow `--focus` ring inside the option + black halo |
+
+## Accessibility
+
+- **Form**: every field has its `<label>`; the order on screen is the order of the keyboard.
+- **Selector group**: a `<fieldset>` with a `<legend>`, so screen readers say what is being chosen ("% de IVA, group"). Radios share one `name`.
+- **Menu · text**: `role="listbox"` with `role="option"` and `aria-selected`; the trigger has `aria-haspopup="listbox"` and `aria-expanded`. Keyboard: ↑ ↓ move, Enter / Space choose, Esc closes and returns to the trigger.
+- **Menu · radio / checkbox**: native inputs in a `<fieldset>` with a (hidden) `<legend>`.
+- Before building a custom dropdown, remember what the browser's `<select>` gives for free: the phone's picker, the keyboard and screen readers.
+
+## CSS
+
+The HTML in the **Code** tab only works together with this CSS. Copy both to get exactly the component shown here (in a prototype, CodePen, a test page…). It contains the fonts, **only the tokens Lists & menus uses**, the base styles (focus ring), the icon class and the component's own styles, plus the styles of the other components that appear in its examples (Input, Selectors).
+
+In the app you don't paste it: the whole design system is loaded once with `mi-contabilidad-ds.css`.
+
+<details>
+<summary><b>Show the CSS</b> (then use the <b>Copy</b> button of the code block)</summary>
+
+<CssSource language="html" dark code={cssSnippet('Lists & menus', ownCss, { also: [['Input', alsoCss0], ['Selectors', alsoCss1]] })} />
+
+</details>

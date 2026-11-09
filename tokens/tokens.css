@@ -168,6 +168,9 @@
   --tab-h:24px;           /* min target 24×24 (WCAG 2.2 AA) */
   --tab-w:160px;          /* fixed-width period / view tabs */
   --menu-gap:var(--space-4);  /* space between a selector and its menu */
+  --menu-min-w:240px;         /* dropdown menu: minimum width */
+  --menu-max-h:320px;         /* dropdown menu: taller lists scroll */
+  --menu-item-h:40px;         /* dropdown menu: one option (same as a field) */
   --year-bar-h:12px;      /* bar under each year */
 
   /* ── Chip & status ── */

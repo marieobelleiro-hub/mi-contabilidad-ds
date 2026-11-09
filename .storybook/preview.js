@@ -12,6 +12,7 @@ import '../components/result/result.css';
 import '../components/feedback/feedback.css';
 import '../components/dialog/dialog.css';
 import '../components/chart/chart.css';
+import '../components/menu/menu.css';
 import '../assistant/tokens.css';      // sub-system · Asistente inteligente
 import '../assistant/assistant.css';
 import '../acceso/tokens.css';         // sub-system · Acceso fácil

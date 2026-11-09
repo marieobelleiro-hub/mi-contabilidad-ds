@@ -10,6 +10,7 @@ import { showcaseTables } from '../components/table/table.stories.js';
 import { fieldHTML, FIELDS } from '../components/input/input.stories.js';
 import { bannerHTML } from '../components/feedback/feedback.stories.js';
 import { Alert as DialogAlert } from '../components/dialog/dialog.stories.js';
+import { formHTML, groupHTML, menuHTML } from '../components/menu/menu.stories.js';
 import { lineChart, barChart } from '../components/chart/chart.js';
 import { ICONS, icon } from '../icons/icons.js';
 import { tokenList, TOKEN_COUNT } from '../foundations/token-list.js';
@@ -34,6 +35,7 @@ const COMPONENTS = [
   ['input', 'Input', 'app-components-input--input', ['Field', 'Amount · small', 'Description', 'Field · inline']],
   ['table', 'Tables', 'app-components-tables--tables', ['Facturación', 'Gastos', 'Últimas facturas', 'Resumen anual', 'Tax forms']],
   ['feedback', 'Banner, tooltip & toast', 'app-components-banner-tooltip-toast--feedback', ['Banner', 'Tooltip', 'Chart tooltip', 'Toast']],
+  ['lists', 'Lists & menus', 'app-components-lists-menus--lists', ['Form', 'Selector group', 'Menu']],
   ['dialog', 'Dialog', 'app-components-dialog--dialog', ['Dialog']],
   ['chart', 'Chart', 'app-components-chart--chart', ['Chart · Line', 'Chart · Bars']],
 ];
@@ -138,6 +140,10 @@ const C = {
     ${row('Tooltip', [`<div class="tooltip" role="tooltip" style="position:static;width:auto;max-width:480px">El salario neto es calculado con esas facturas, restando los gastos del mes anterior, independientemente de si los pagos se hayan realizado.</div>`])}
     ${row('Chart tooltip', [`<div class="tooltip tooltip--dark" role="tooltip" style="position:static"><b>Julio</b><br><span class="tooltip__swatch" style="background:var(--income-light)"></span>Ingresos <b>8.203,35 €</b><br><span class="tooltip__swatch" style="background:var(--expense-light)"></span>Gastos <b>1.072,54 €</b></div>`])}
     ${row('Toast', [`<div class="toast toast--inline" role="status" style="width:400px;max-width:100%"><span>Factura 411 eliminada.</span><button type="button" class="toast__action">Deshacer</button></div>`])}`,
+  lists: `
+    ${row('Form', [`<div style="width:342px;max-width:100%">${formHTML({ form: 'gasto-cat' })}</div>`])}
+    ${row('Selector group', [`<div class="sc__grid sc__grid--3" style="flex:1">${groupHTML({ kind: 'checkbox', selected: [0, 1] })}${groupHTML({ kind: 'radio', accent: 'attention' })}${groupHTML({ kind: 'choice' })}</div>`])}
+    ${row('Menu', [`<div style="display:flex;flex-wrap:wrap;gap:var(--space-24);align-items:flex-start">${menuHTML({ kind: 'text', items: 'iva' })}${menuHTML({ kind: 'radio', accent: 'attention', items: 'iva' })}${menuHTML({ kind: 'checkbox', items: 'iva', selected: [0, 2] })}</div><p class="sc__label" style="margin:var(--space-8) 0 0">Not in the app yet: the app uses the browser's own menus</p>`])}`,
   dialog: row('Dialog', [`<div style="width:400px;max-width:100%">${DialogAlert.render().outerHTML}</div>`]),
   chart: `<div class="sc__grid sc__grid--2">
       ${block('Chart · Line', `<section class="card"><div class="card__header"><h4 class="card__title">Comparativa Ingresos · Gastos</h4></div>${slot('line')}</section>`)}
