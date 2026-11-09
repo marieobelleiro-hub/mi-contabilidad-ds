@@ -70,7 +70,7 @@ const factTotals = (type, list) => {
   if (type === 'ext') return [`Total (neto): ${fmt(list.reduce((a, f) => a + f.base, 0))}`];
   if (!list.length) return [];
   const s = list.reduce((a, f) => { const c = factCalc(f); a.b += f.base; a.i += c.iva; a.r += c.ret; return a; }, { b: 0, i: 0, r: 0 });
-  return [`Total (neto): ${fmt(s.b + s.i - s.r)}`, `IVA: ${fmt(s.i)}`, `IRPF: ${fmt(s.r)}`];
+  return [`Total (neto): ${fmt(s.b + s.i - s.r)}`];   // as in the app: IVA and IRPF are in the columns / the record rows
 };
 const FACT_TITLE = { esp: 'Facturas nacionales', ext: 'Facturas exentas de impuestos' };
 
@@ -102,7 +102,7 @@ const factDesktop = ({ table, state }) => {
     footer('primary', 'Añadir factura', factTotals(table, list), ro))}${ro ? '' : legend}`;
 };
 
-const factMobile = ({ table, state }) => {
+export const factMobile = ({ table, state }) => {
   const ro = state === 'readonly';
   const list = facts(table, state);
   const items = list.map((f) => {
@@ -118,7 +118,7 @@ const factMobile = ({ table, state }) => {
 export default {
   title: 'App/Components/Tables',
   tags: ['!autodocs'],   // documented in Table.mdx
-  excludeStories: ['showcaseTables', 'taxFormHTML'],
+  excludeStories: ['showcaseTables', 'taxFormHTML', 'factMobile', 'gastoMobile'],
   parameters: { layout: 'padded' },
   globals: { backgrounds: { value: 'canvas' } },
 };
@@ -180,7 +180,7 @@ const gastoDesktop = (a) => {
     footer('attention', gAdd(a), gTotals(a, list), ro), info);
 };
 
-const gastoMobile = (a) => {
+export const gastoMobile = (a) => {
   const ro = a.state === 'readonly';
   const list = gastos(a);
   const items = list.map((g) => {

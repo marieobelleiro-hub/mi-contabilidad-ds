@@ -33,9 +33,9 @@ const COMPONENTS = [
   ['selectors', 'Selectors', 'app-components-selectors--selectors', ['Checkbox & radio', 'Choice card', 'Status dot', 'Switch', 'Chip']],
   ['card', 'Card', 'app-components-card--card', ['KPI card']],
   ['input', 'Input', 'app-components-input--input', ['Field', 'Amount · small', 'Description', 'Field · inline']],
+  ['lists', 'Lists & menus', 'app-components-lists-menus--lists', ['Form', 'Selector group', 'Menu']],
   ['table', 'Tables', 'app-components-tables--tables', ['Facturación', 'Gastos', 'Últimas facturas', 'Resumen anual', 'Tax forms']],
   ['feedback', 'Banner, tooltip & toast', 'app-components-banner-tooltip-toast--feedback', ['Banner', 'Tooltip', 'Chart tooltip', 'Toast']],
-  ['lists', 'Lists & menus', 'app-components-lists-menus--lists', ['Form', 'Selector group', 'Menu']],
   ['dialog', 'Dialog', 'app-components-dialog--dialog', ['Dialog']],
   ['chart', 'Chart', 'app-components-chart--chart', ['Chart · Line', 'Chart · Bars']],
 ];

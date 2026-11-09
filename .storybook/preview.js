@@ -78,7 +78,7 @@ const preview = {
       storySort: { order: [
         'Introduction',
         'App', ['Introduction', 'Foundations', ['Colors', 'Typography', 'Spacing, radius & elevation', 'Layout & breakpoints', 'Icons', 'Tokens'],
-          'Components', ['Button', 'Tab', 'Selectors', 'List row', 'Card', 'Input', 'Tables', 'Banner, tooltip & toast', 'Dialog', 'Chart', '*'], 'Showcase'],
+          'Components', ['Button', 'Tab', 'Selectors', 'List row', 'Card', 'Input', 'Lists & menus', 'Tables', 'Banner, tooltip & toast', 'Dialog', 'Chart', '*'], 'Showcase'],
         'Chatbot', ['Introduction', 'Foundations', ['Colors', 'Typography', 'Tokens'], 'Components', ['Panel', 'Messages', 'Suggestion chips', 'Composer', 'Question & form cards']],
         'Accessibility assistant', ['Introduction', 'Foundations', ['Colors', 'Typography', 'Tokens'], 'Components', ['Panel', 'Steps & options', 'Answer', 'Form on dark']],
       ] },

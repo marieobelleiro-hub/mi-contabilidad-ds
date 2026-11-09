@@ -22,6 +22,8 @@ Components that **put several inputs or options together**. Three components, th
 
 The fields of a form in their order, 20px apart (`form`), in the colour of the section (`form--primary` / `form--attention`). **Tinted** is for the mobile forms: they fill the screen with no card around them, so the tint shows where to type. In the app a form always lives inside the full-screen dialog, with its title, Cancelar and Guardar.
 
+The mobile forms start with the **quarter dropdown** (the grey <a href="./?path=/docs/app-components-tab--docs" target="_top">Tab · selector</a>): the quarter the record is saved in, so it can be changed without leaving the form. They show a **live total** (`field__total`, 14px bold capitals, in the form's colour): **Total factura** = base + IVA − 15 % IRPF retention (exenta: the base) · **Total gasto** = base + IVA. If the date is not in the chosen quarter, the Atención! alert appears **before** saving and the form stays open.
+
 <Canvas of={ListStories.Form} />
 <Controls of={ListStories.Form} />
 

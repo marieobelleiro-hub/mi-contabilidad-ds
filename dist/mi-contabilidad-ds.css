@@ -825,7 +825,7 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
 .card__title--accent{color:var(--card-accent)}
 
 .card__body{flex:1;min-width:0}
-.card__text{margin:0 0 var(--space-12);font-family:var(--font-sans);font-size:var(--text-12);line-height:var(--leading-normal);color:var(--text)}   /* a short explanation under the header (Cálculo del salario) */
+.card__text{margin:0 0 var(--space-12);font-family:var(--font-sans);font-size:var(--text-14);line-height:var(--leading-normal);color:var(--text-muted)}   /* a short explanation under the header (Cálculo del salario): grey, lighter than the content · 14, 16 on mobile */
 .card__body--scroll{overflow-x:auto}           /* wide tables on mobile */
 
 /* ── Footer: totals on the left, action on the right ── */
@@ -917,6 +917,7 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
 
 /* ── Mobile ── */
 @media (max-width:1023px){
+  .card__text{font-size:var(--text-16)}
   .card{--card-pad-x:var(--space-20)}
   .card-grid--2,.card-grid--4{grid-template-columns:1fr;gap:var(--space-12)}
 }
@@ -1185,6 +1186,8 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
 .record__row dd{display:inline-flex;align-items:center;gap:var(--space-8);margin:0}
 .record__row--total dd strong{font-weight:var(--weight-medium)}
 .record__side{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:var(--space-8)}
+.record__side:has(.table__check){justify-content:space-between}          /* Gastos: the 303 checkbox at the top (under "303"), delete at the bottom */
+.record__side .table__check{width:var(--check-size);height:var(--check-size)}   /* 20px on touch screens */
 .records__303{margin:0;font-family:var(--font-sans);font-size:var(--text-12);color:var(--text-muted);text-align:right}
 .records__empty{margin:0;padding:var(--space-8) 0;font-family:var(--font-sans);font-size:var(--text-14);color:var(--text-muted)}
 .table-totals--stack{flex-direction:column;gap:var(--space-8);font-size:var(--text-14)}
@@ -1205,6 +1208,7 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
    Input:    .input (on <input>, <select>, <textarea>) · --sm (24px, tax forms) · --num (mono, right: only with --sm)
    Accent:   .field--primary / --attention (or on any ancestor) — focus border, tint, checks
    Form:     .form = a list of fields, 20px apart (+ form--primary / --attention, form--tinted)
+             first item of the mobile forms: the quarter dropdown (.tab-menu) · last: .field__total (live total)
    Option:   .field--tinted / .form--tinted (accent tint background — only the mobile forms Nueva factura / Nuevo gasto)
              .input--filled (grey box — the Notas textareas of the tax forms)
    States:   hover · focus (shown in the docs with .is-hover / .is-focus) · [aria-invalid="true"] · :disabled
@@ -1225,6 +1229,7 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
   min-width:0;
 }
 .form{display:flex;flex-direction:column;gap:var(--space-20)}   /* a list of fields: the mobile forms */
+.form > .tab-menu{align-self:flex-start}   /* the quarter dropdown keeps the width of its label */
 .field--primary,.form--primary{--field-accent:var(--primary);--field-tint:var(--primary-tint)}
 .field--attention,.form--attention{--field-accent:var(--attention);--field-tint:var(--attention-tint)}
 .form--attention .field{--field-accent:var(--attention);--field-tint:var(--attention-tint)}
@@ -1560,7 +1565,8 @@ textarea.input{height:auto;min-height:var(--textarea-min-h);padding:var(--space-
    and ::backdrop dims the page.
 
    Sizes:    --md 640px (default: welcome, forms) · --sm 400px (alerts)
-   Parts:    __top (switch above the title) · __header (title + close or ghost button) · __title · __body · __actions
+   Types:    default · --form (fields) · --list (cards on the grey canvas, no actions: Ver todas las facturas / todos los gastos)
+   Parts:    __top (switch above the title) · __header (title + close or ghost button) · __heading (title + ⓘ) · __title · __body · __actions
    Mobile:   full screen, actions stuck to the bottom (except --sm, which stays centred)
    Docs:     .dialog--static shows the panel inline, without opening it
 
@@ -1625,6 +1631,21 @@ textarea.input{height:auto;min-height:var(--textarea-min-h);padding:var(--space-
 }
 .dialog__actions--split{justify-content:space-between}
 
+/* Heading: the title with an ⓘ right after it */
+.dialog__heading{display:flex;align-items:center;gap:var(--space-12);min-width:0}
+.dialog__header .dialog__heading .btn--icon{margin:0}
+
+/* List: cards on the grey canvas, 16px apart; no action bar */
+.dialog.dialog--list{background:var(--canvas)}
+.dialog--list .dialog__header{align-items:center}
+.dialog--list .dialog__body{line-height:normal}
+.dialog--list .btn--ghost.btn--primary{--btn-accent:var(--primary-dark)}      /* contrast on the grey canvas */
+.dialog--list .btn--ghost.btn--attention{--btn-accent:var(--attention-dark)}
+/* grand totals after the cards (on the canvas, not in a card): 4px in, the dark shade for contrast */
+.dialog--list .table-totals:not(.card .table-totals){padding-inline:var(--space-4)}
+.dialog--list .table-totals--primary:not(.card .table-totals){color:var(--primary-dark)}
+.dialog--list .table-totals--attention:not(.card .table-totals){color:var(--attention-dark)}
+
 /* Documentation preview: the panel without the modal behaviour */
 .dialog--static{position:static;display:block;width:100%;max-height:none;margin:0}
 
@@ -1650,6 +1671,10 @@ textarea.input{height:auto;min-height:var(--textarea-min-h);padding:var(--space-
     background:var(--surface);
   }
   .dialog--sm{width:calc(100% - var(--space-32))}
+  /* List: the cards go 16px from the edges, the title stays at 24px; the body scrolls under the header */
+  .dialog--list:not(.dialog--sm):not(.dialog--static){padding-inline:var(--space-16)}
+  .dialog--list .dialog__header{padding-inline:var(--space-8)}
+  .dialog--list:not(.dialog--static) .dialog__body{padding-bottom:max(var(--space-32),env(safe-area-inset-bottom))}
 }
 
 /* ── components/chart/chart.css ── */

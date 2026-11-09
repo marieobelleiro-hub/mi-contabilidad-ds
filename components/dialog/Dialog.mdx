@@ -15,7 +15,7 @@ A window over the page that needs an answer before you go on. It's built on the 
 
 ## Dialog
 
-One component with all its controls, the same as the Figma component **Dialog**. The four kinds of dialog, with placeholder text (Title · Message text). Choose the **Type**; the **Button** list changes with it, and the size follows the type.
+One component with all its controls, the same as the Figma component **Dialog**. The five kinds of dialog, with placeholder text (Title · Message text). Choose the **Type**; the **Button** list changes with it, and the size follows the type.
 
 <Canvas of={DialogStories.Playground} sourceState="none" />
 <Controls of={DialogStories.Playground} />
@@ -26,10 +26,12 @@ One component with all its controls, the same as the Figma component **Dialog**.
 | **Attention** | orange | `dialog--sm` 400px | Entendido · Guardar | `alertdialog` |
 | **Error** | red (`btn--danger`) | `dialog--sm` 400px | Confirmar · Entendido | `alertdialog` |
 | **Multi-option** | blue | `dialog--md` 640px | Descargar ↓ · Guardar · Continuar → | `dialog` |
+| **List** | grey canvas, cards inside | `dialog--md dialog--list` (full screen on mobile) | none: Cerrar (ghost) in the header | `dialog` |
 
 - **Cancelar** (optional) is a ghost button on the left, in the dialog colour (`dialog__actions--split`). Never two solid buttons.
 - **Language toggle** (optional): the Esp / Eng switch above the title (`dialog__top`); in the app it changes the text of the dialog.
 - **Multi-option**: the options are radios as cards (`choice` in a `choice-group`, see <a href="./?path=/docs/app-components-selectors--selectors" target="_top">Selectors</a>), the first one chosen.
+- **List**: cards on the grey canvas, 16px apart; the header stays while the cards scroll. Optional ⓘ right after the title (`dialog__heading`). In the app: **Ver todas las facturas / todos los gastos** on mobile (see Mobile lists).
 - **Error** is not in the app yet: it's ready for actions that can't be undone (Eliminar año, a browser box today).
 
 ## App dialogs
@@ -50,7 +52,7 @@ The real dialogs of the **Demo** (online) and the **Local** version (the one you
 | Datos importados · Formato no reconocido · Error al abrir / guardar · Navegador no compatible · Primero abre el archivo | Local | Informative / Error | — | Browser boxes today: to design |
 | Tienes cambios sin guardar (leaving the page) | Local | — | — | Browser's own warning: can't be styled |
 
-**Bienvenida** (Demo; the switch changes the text) and **Atención!** (shown after saving an invoice or an expense when the date looks wrong; it never blocks the save):
+**Bienvenida** (Demo; the switch changes the text) and **Atención!** (date check. In the mobile forms it appears **before** saving when the date is not in the chosen quarter: Entendido returns to the form to correct the date or the quarter, and Guardar again with no change saves. On desktop it follows the edit of the date in the table):
 
 <Canvas of={DialogStories.Welcome} sourceState="none" />
 <Canvas of={DialogStories.Alert} sourceState="none" />
@@ -79,6 +81,13 @@ The real dialogs of the **Demo** (online) and the **Local** version (the one you
 - IVA 0 % → "Incluir en el 303" off.
 - **Total gasto** (`field__total`: Sans 14 / 700 caps, in the field colour) updates as you type the base.
 
+## Mobile lists
+
+**Ver todas las facturas** and **Ver todos los gastos** (mobile): the **List** dialog. Title with the period (Facturación 3T 2026) and ⓘ, ghost **Cerrar** in the section colour (the dark shade, for contrast on the grey canvas). The body holds the mobile cards of the <a href="./?path=/docs/app-components-tables--docs" target="_top">Tables</a> (records); Gastos starts with its view toggle (Por cat. IRPF · Por % IVA). After the cards: the grand totals and, in Facturación, the legend of the status dots.
+
+<Canvas of={DialogStories.MobileLists} sourceState="none" />
+<Controls of={DialogStories.MobileLists} />
+
 ## Sizes
 
 | | `dialog--md` (default) | `dialog--sm` |
@@ -95,7 +104,8 @@ The real dialogs of the **Demo** (online) and the **Local** version (the one you
 | Panel | `--surface` · 1px `--line` · radius 0 |
 | Backdrop | `--overlay` 45% black |
 | Top (`dialog__top`) | Optional, above the title, right-aligned: the language switch · 16px below |
-| Header | Title on the left · optional action on the right (Cancelar ghost button on mobile forms) · 20px below |
+| Header | Title on the left · optional action on the right (Cancelar ghost button on mobile forms, Cerrar on lists) · 20px below |
+| Heading | `dialog__heading`: the title with an ⓘ right after it (12px gap) |
 | Title | `dialog__title` · Display · Light (24 / 300) |
 | Body | `dialog__body` · Sans 16 · line height 1.6 · 16px between paragraphs (forms: 20px between fields) |
 | Actions | `dialog__actions` · right-aligned · 16px gap · 24px above · `--split`: Cancelar on the left, the main action on the right |

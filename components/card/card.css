@@ -51,7 +51,7 @@
 .card__title--accent{color:var(--card-accent)}
 
 .card__body{flex:1;min-width:0}
-.card__text{margin:0 0 var(--space-12);font-family:var(--font-sans);font-size:var(--text-12);line-height:var(--leading-normal);color:var(--text)}   /* a short explanation under the header (Cálculo del salario) */
+.card__text{margin:0 0 var(--space-12);font-family:var(--font-sans);font-size:var(--text-14);line-height:var(--leading-normal);color:var(--text-muted)}   /* a short explanation under the header (Cálculo del salario): grey, lighter than the content · 14, 16 on mobile */
 .card__body--scroll{overflow-x:auto}           /* wide tables on mobile */
 
 /* ── Footer: totals on the left, action on the right ── */
@@ -143,6 +143,7 @@
 
 /* ── Mobile ── */
 @media (max-width:1023px){
+  .card__text{font-size:var(--text-16)}
   .card{--card-pad-x:var(--space-20)}
   .card-grid--2,.card-grid--4{grid-template-columns:1fr;gap:var(--space-12)}
 }

@@ -142,8 +142,8 @@ export const Salario = {
   parameters: { layout: 'padded' },
   ...VIEW,
   render: responsive('app-components-card--salario', () => `<section class="card card--primary" style="max-width:1108px" aria-labelledby="sal-t">
-    <div class="card__header"><h2 class="card__title card__title--caps" id="sal-t">Cálculo del salario (Dashboard)</h2></div>
-    <p class="card__text" id="sal-h">Defina los clientes en base a cuyas facturas se calculará el salario mensual. Sepáralos por el signo + entre medias, si son varios nombres o escriba «Todas» en caso de querer considerar la facturación total mensual.</p>
+    <div class="card__header"><h2 class="card__title card__title--caps" id="sal-t">Cálculo del salario (Dashboard)</h2>${INFO}</div>
+    <p class="sr-only" id="sal-h">Defina los clientes en base a cuyas facturas se calculará el salario mensual. Sepáralos por el signo + entre medias, si son varios nombres o escriba «Todas» en caso de querer considerar la facturación total mensual.</p>
     <div class="field field--primary field--inline">
       <label class="field__label" for="sal-c">Clientes</label>
       <input class="input" id="sal-c" type="text" value="Main client" placeholder="Main client" autocomplete="off" aria-describedby="sal-h">

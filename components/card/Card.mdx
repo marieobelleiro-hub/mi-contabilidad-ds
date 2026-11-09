@@ -117,14 +117,14 @@ What goes inside lives on its own page: the tables, the Últimas facturas list a
 
 ### Cálculo del salario
 
-The setting of Facturación that decides which invoices count for the monthly salary on the dashboard. A short explanation under the header (`card__text`: Sans 12, `--text`) and one **Input** with its label on the left (`field--inline`): Clientes. Responsive like every container: try the **View** control.
+The setting of Facturación that decides which invoices count for the monthly salary on the dashboard. The explanation is in the ⓘ tooltip on the right of the title, like the other cards (it stays linked to the input for screen readers), and one **Input** with its label on the left (`field--inline`): Clientes. Responsive like every container: try the **View** control.
 
 <Canvas of={CardStories.Salario} />
 <Controls of={CardStories.Salario} />
 
 | Part | Class | Style |
 |---|---|---|
-| Explanation | `card__text` | Sans 12 · `--text` · linked to the field with `aria-describedby` |
+| Explanation | `card__text` | Sans 14 (16 on mobile) · `--text-muted`, lighter than the content · linked to the field with `aria-describedby` |
 | Field | `field field--primary field--inline` | label and box on one line, 12px apart · the box grows up to `--input-inline-max-w` 520px · they wrap on narrow screens |
 
 ## Markup

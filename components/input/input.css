@@ -7,6 +7,7 @@
    Input:    .input (on <input>, <select>, <textarea>) · --sm (24px, tax forms) · --num (mono, right: only with --sm)
    Accent:   .field--primary / --attention (or on any ancestor) — focus border, tint, checks
    Form:     .form = a list of fields, 20px apart (+ form--primary / --attention, form--tinted)
+             first item of the mobile forms: the quarter dropdown (.tab-menu) · last: .field__total (live total)
    Option:   .field--tinted / .form--tinted (accent tint background — only the mobile forms Nueva factura / Nuevo gasto)
              .input--filled (grey box — the Notas textareas of the tax forms)
    States:   hover · focus (shown in the docs with .is-hover / .is-focus) · [aria-invalid="true"] · :disabled
@@ -27,6 +28,7 @@
   min-width:0;
 }
 .form{display:flex;flex-direction:column;gap:var(--space-20)}   /* a list of fields: the mobile forms */
+.form > .tab-menu{align-self:flex-start}   /* the quarter dropdown keeps the width of its label */
 .field--primary,.form--primary{--field-accent:var(--primary);--field-tint:var(--primary-tint)}
 .field--attention,.form--attention{--field-accent:var(--attention);--field-tint:var(--attention-tint)}
 .form--attention .field{--field-accent:var(--attention);--field-tint:var(--attention-tint)}

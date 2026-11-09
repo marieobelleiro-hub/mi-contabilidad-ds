@@ -5,6 +5,8 @@ import { icon } from '../../icons/icons.js';
 import { switchHTML } from '../selectors/selectors.stories.js';
 import { inFrame, frameArgs, mobileFrame, frameRoot } from '../../foundations/mobile-frame.js';
 import { entryForm, wireEntryForm, CAT_OPTS, IVA } from '../input/entry-form.js';
+import { factMobile, gastoMobile } from '../table/table.stories.js';
+import { INVOICES, EXPENSES, CATEGORIES, fmt } from '../table/table-data.js';
 const ARROW = icon('arrow-right', { size: 'md' });
 const DOWNLOAD = icon('download', { size: 'md' });
 const SAVE = icon('save', { size: 'md' });
@@ -60,18 +62,21 @@ const saveCopy = () => ({
 });
 
 /** Dialog markup. static = shown inline (docs); otherwise a real <dialog>. */
-export const dialogHTML = ({ size = 'md', role, top = '', title, headerAction = '', body, actions, form = false, split = false, lang }, isStatic = false) => {
+export const dialogHTML = ({ size = 'md', role, top = '', title, info = false, headerAction = '', body, actions = '', form = false, list = false, split = false, lang }, isStatic = false) => {
   const id = `dlg-${++n}`;
   const cls = ['dialog', `dialog--${size}`];
   if (form) cls.push('dialog--form');
+  if (list) cls.push('dialog--list');
+  const heading = `<h2 class="dialog__title" id="${id}">${title}</h2>`;
+  const infoBtn = `<button type="button" class="btn btn--icon btn--sm btn--info" aria-label="Información">${icon('info')}</button>`;
   if (isStatic) cls.push('dialog--static');
   const tag = isStatic ? 'div' : 'dialog';
   const r = role || (isStatic ? 'dialog' : '');
   return `<${tag} class="${cls.join(' ')}" aria-labelledby="${id}"${r ? ` role="${r}"` : ''}${lang ? ` lang="${lang}"` : ''}>
     ${top ? `<div class="dialog__top">${top}</div>` : ''}
-    <div class="dialog__header"><h2 class="dialog__title" id="${id}">${title}</h2>${headerAction}</div>
+    <div class="dialog__header">${info ? `<div class="dialog__heading">${heading}${infoBtn}</div>` : heading}${headerAction}</div>
     <div class="dialog__body">${body}</div>
-    <div class="dialog__actions${split ? ' dialog__actions--split' : ''}">${actions}</div>
+    ${actions ? `<div class="dialog__actions${split ? ' dialog__actions--split' : ''}">${actions}</div>` : ''}
   </${tag}>`;
 };
 
@@ -129,8 +134,10 @@ const TYPE = {
   attention: { variant: 'attention', size: 'sm', role: 'alertdialog' },
   error: { variant: 'danger', size: 'sm', role: 'alertdialog' },
   choice: { variant: 'primary', size: 'md', role: 'dialog' },
+  list: { variant: 'primary', size: 'md', role: 'dialog' },
 };
 const genericDialog = (a) => {
+  if (a.type === 'list') return { ...listDialog('facturas'), title: a.title, info: a.info };
   const t = TYPE[a.type];
   const key = { info: a.infoButton, attention: a.attentionButton, error: a.errorButton, choice: a.choiceButton }[a.type];
   const [label, ico] = BUTTONS[key];
@@ -162,10 +169,11 @@ export const Playground = {
   parameters: { controls: { disable: false } },
   argTypes: {
     view: { name: 'View', control: { type: 'inline-radio', labels: { desktop: 'Desktop', mobile: 'Mobile (390px)' } }, options: ['desktop', 'mobile'] },
-    type: { name: 'Type', control: { type: 'inline-radio', labels: { info: 'Informative (blue)', attention: 'Attention (orange)', error: 'Error (red)', choice: 'Multi-option' } }, options: ['info', 'attention', 'error', 'choice'] },
-    languageSwitch: { name: 'Language toggle', control: 'boolean', description: 'Esp / Eng switch above the title' },
+    type: { name: 'Type', control: { type: 'inline-radio', labels: { info: 'Informative (blue)', attention: 'Attention (orange)', error: 'Error (red)', choice: 'Multi-option', list: 'List (cards)' } }, options: ['info', 'attention', 'error', 'choice', 'list'] },
+    languageSwitch: { name: 'Language toggle', control: 'boolean', description: 'Esp / Eng switch above the title', if: { arg: 'type', neq: 'list' } },
+    info: byType('list', { name: 'Info button', control: 'boolean', description: 'ⓘ right after the title' }),
     title: { name: 'Title', control: 'text' },
-    message: { name: 'Message', control: 'text' },
+    message: { name: 'Message', control: 'text', if: { arg: 'type', neq: 'list' } },
     option1: byType('choice', { name: 'Option 1 · title', control: 'text' }),
     option1Desc: byType('choice', { name: 'Option 1 · text', control: 'text' }),
     option2: byType('choice', { name: 'Option 2 · title', control: 'text' }),
@@ -174,10 +182,10 @@ export const Playground = {
     attentionButton: byType('attention', { name: 'Button', control: { type: 'inline-radio', labels: { entendido: 'Entendido', guardar: 'Guardar' } }, options: ['entendido', 'guardar'] }),
     errorButton: byType('error', { name: 'Button', control: { type: 'inline-radio', labels: { confirmar: 'Confirmar', entendido: 'Entendido' } }, options: ['confirmar', 'entendido'] }),
     choiceButton: byType('choice', { name: 'Button', control: { type: 'inline-radio', labels: { descargar: 'Descargar ↓', guardar: 'Guardar', continuar: 'Continuar →' } }, options: ['descargar', 'guardar', 'continuar'] }),
-    cancel: { name: 'Cancelar', control: 'boolean', description: 'Ghost button on the left' },
+    cancel: { name: 'Cancelar', control: 'boolean', description: 'Ghost button on the left', if: { arg: 'type', neq: 'list' } },
   },
   args: {
-    view: 'desktop', type: 'info', languageSwitch: false, title: 'Title', message: 'Message text.',
+    view: 'desktop', type: 'info', languageSwitch: false, info: true, title: 'Title', message: 'Message text.',
     option1: 'Option 1', option1Desc: 'Option text.', option2: 'Option 2', option2Desc: 'Option text.',
     infoButton: 'continuar', attentionButton: 'entendido', errorButton: 'confirmar', choiceButton: 'descargar', cancel: false,
   },
@@ -268,9 +276,42 @@ export const MobileForms = {
   },
 };
 
+/* ══ Mobile lists: Ver todas las facturas / todos los gastos (List type, docs only) ══ */
+const GVIEW = (v) => `<div class="tab-list tab-list--fluid" role="group" aria-label="Ordenar gastos"><button type="button" class="tab tab--attention${v === 'cat' ? ' is-active' : ''}" aria-pressed="${v === 'cat'}">Por cat. IRPF</button><button type="button" class="tab tab--attention${v === 'iva' ? ' is-active' : ''}" aria-pressed="${v === 'iva'}">Por % IVA</button></div>`;
+/* The 3T 2026 of the demo, as in the app: every card, then the grand totals (and the legend of the status dots) */
+const Q = 3;
+const factNeto = INVOICES.filter((f) => f.trim === Q).reduce((a, f) => a + f.base * (1 + f.iva / 100 - (f.ret ? 0.15 : 0)), 0);
+const gq = EXPENSES.filter((g) => g.trim === Q);
+const gBase = gq.reduce((a, g) => a + g.base, 0), gIva = gq.reduce((a, g) => a + g.base * g.iva / 100, 0);
+const LEGEND = '<p style="display:flex;gap:var(--space-24);margin:0;padding-inline:var(--space-4)"><span class="status-label"><span class="status status--paid" aria-hidden="true"></span>Cobrada</span><span class="status-label"><span class="status status--pending" aria-hidden="true"></span>Pendiente</span></p>';
+const listDialog = (which) => (which === 'gastos'
+  ? { list: true, info: true, title: 'Gastos 3T 2026', headerAction: '<button type="button" class="btn btn--ghost btn--attention"><span class="btn__label">Cerrar</span></button>',
+    body: GVIEW('cat') + CATEGORIES.filter((c) => gq.some((g) => g.cat === c.id)).map((c) => gastoMobile({ list: 'cat', cat: c.id, state: 'editable' })).join('')
+      + `<p class="table-totals table-totals--attention table-totals--stack"><span>Total gastado: ${fmt(gBase + gIva)}</span><span>Base: ${fmt(gBase)}</span><span>IVA: ${fmt(gIva)}</span></p>
+      <div style="display:flex;justify-content:flex-end"><button type="button" class="btn btn--ghost btn--attention">${icon('plus')}<span class="btn__label">Añadir gasto</span></button></div>` }
+  : { list: true, info: true, title: 'Facturación 3T 2026', headerAction: '<button type="button" class="btn btn--ghost btn--primary"><span class="btn__label">Cerrar</span></button>',
+    body: factMobile({ table: 'esp', state: 'editable' }) + factMobile({ table: 'ext', state: 'editable' })
+      + `<p class="table-totals table-totals--primary table-totals--stack"><span>Total (neto): ${fmt(factNeto)}</span></p>${LEGEND}` });
+export const MobileLists = {
+  name: 'Mobile lists',
+  tags: ['!dev'],
+  parameters: { layout: 'fullscreen', controls: { disable: false } },
+  argTypes: { which: { name: 'List', control: { type: 'inline-radio', labels: { facturas: 'Ver todas las facturas', gastos: 'Ver todos los gastos' } }, options: ['facturas', 'gastos'] } },
+  args: { which: 'facturas' },
+  render: (a) => {
+    if (!inFrame()) return mobileFrame('app-components-dialog--mobile-lists', a, { height: 844, bg: 'canvas' });
+    a = { ...a, ...frameArgs() };
+    const el = document.createElement('div');
+    el.innerHTML = dialogHTML(listDialog(a.which));
+    el.querySelector('dialog').setAttribute('open', '');
+    return el;
+  },
+};
+
 /* ── Design tab: the matching component in the Figma library ── */
 Playground.parameters = { ...Playground.parameters, design: figma('65:142') };
 MobileForms.parameters = { ...MobileForms.parameters, design: figma('66:281') };
+MobileLists.parameters = { ...MobileLists.parameters, design: figma('175:3848') };
 AppDialogs.parameters = { ...AppDialogs.parameters, design: figma('66:24') };
 Welcome.parameters = { ...Welcome.parameters, design: figma('66:34') };
 Alert.parameters = { ...Alert.parameters, design: figma('66:89') };
