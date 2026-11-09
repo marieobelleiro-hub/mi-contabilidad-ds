@@ -63,9 +63,9 @@ The active tab takes the colour of what the section is about:
 
 The outline marks the tax sections (IVA, IRPF), so they look different from the sections where you enter data.
 
-## Page tabs
+## Tab
 
-One tab with all its properties. **View** shows it on desktop (a tab) or on mobile (a selector with the chevron, which opens the menu). **Colour** is the colour of the section: green (Dashboard), blue (Facturación, IRPF), orange (Gastos, IVA).
+One tab with all its properties, the same as the Figma component **Tab**: **Colour** (the colour of the section: green Dashboard, blue Facturación / IRPF, orange Gastos / IVA, grey periods), **Style** (filled or outline), **State** (Active, Default, Hover, Disabled, Focus) and the **Label**. Page tabs, period tabs, the view toggle and the sidebar navigation above are all made of this one tab.
 
 <Canvas of={TabStories.Playground} />
 <Controls of={TabStories.Playground} />
@@ -95,9 +95,12 @@ On mobile the view toggle shares the row equally (`tab-list--fluid`):
 
 <Canvas of={TabStories.Mobile} sourceState="none" />
 
-## Selectors (mobile)
+## Tab · selector
 
-On mobile there is no sidebar and no period tabs. A **selector** shows the current choice; tapping it opens the list.
+On mobile there is no sidebar and no period tabs. A **selector** shows the current choice; tapping it opens the list. Same as the Figma component **Tab · selector** (Colour, Style, Open, Label).
+
+<Canvas of={TabStories.TabSelector} />
+<Controls of={TabStories.TabSelector} />
 
 | | Value |
 |---|---|

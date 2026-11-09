@@ -13,9 +13,9 @@ import ownCss from './dialog.css?raw';
 
 A window over the page that needs an answer before you go on. It's built on the browser's native `<dialog>` element, which keeps focus inside, closes with **Esc**, and dims the page behind it.
 
-## Playground
+## Dialog
 
-The four kinds of dialog, with placeholder text (Title · Message text). Choose the **Type**; the **Button** list changes with it, and the size follows the type.
+One component with all its controls, the same as the Figma component **Dialog**. The four kinds of dialog, with placeholder text (Title · Message text). Choose the **Type**; the **Button** list changes with it, and the size follows the type.
 
 <Canvas of={DialogStories.Playground} sourceState="none" />
 <Controls of={DialogStories.Playground} />
@@ -44,7 +44,7 @@ The real dialogs of the **Demo** (online) and the **Local** version (the one you
 | **Atención!** (date check) | Demo · Local | Attention | Entendido | ✓ |
 | **Instrucciones para la app local** | Local | Informative | Cancelar · Continuar | ✓ |
 | **Guardar copia .html** | Local | Multi-option | Cancelar · Descargar | ✓ |
-| **Nueva factura** (nacional · exenta) · **Nuevo gasto** | Demo · Local, mobile | Form, full screen | Cancelar · Guardar | ✓ in <a href="./?path=/docs/app-components-input--input" target="_top">Input › Mobile forms</a> |
+| **Nueva factura** (nacional · exenta) · **Nuevo gasto** | Demo · Local, mobile | Form, full screen | Cancelar · Guardar | ✓ [below](#mobile-forms) |
 | Eliminar año (confirm) | Demo · Local | Error | Cancelar · Confirmar | Browser box today: to design |
 | ¿Con qué año quieres empezar? · Año no válido · Añadir un % de IVA | Demo · Local | Informative / Attention | — | Browser boxes today: to design |
 | Datos importados · Formato no reconocido · Error al abrir / guardar · Navegador no compatible · Primero abre el archivo | Local | Informative / Error | — | Browser boxes today: to design |
@@ -59,6 +59,25 @@ The real dialogs of the **Demo** (online) and the **Local** version (the one you
 
 <Canvas of={DialogStories.Auth} sourceState="none" />
 <Canvas of={DialogStories.SaveCopy} sourceState="none" />
+
+## Mobile forms
+
+**Nueva factura** (nacional · exenta) and **Nuevo gasto**: on mobile you add a record through a full-screen dialog (title, ghost Cancelar, the fields, Guardar stuck to the bottom). On desktop you type straight into the table. The fields are the <a href="./?path=/docs/app-components-input--input" target="_top">Input › Field</a>, tinted, 20px apart. Choose the form in **Form**.
+
+<Canvas of={DialogStories.MobileForms} sourceState="none" />
+<Controls of={DialogStories.MobileForms} />
+
+| Form | Colour | Fields, in order | Checkbox |
+|---|---|---|---|
+| Facturación · **Nueva factura nacional** | blue | Número de factura · Fecha · Cliente · Concepto · Base imponible en € · % de IVA | Aplicar retención IRPF del 15 % |
+| Facturación · **Nueva factura exenta de impuestos** | blue | Número de factura · Fecha · Cliente · Concepto · Base imponible en € | — |
+| Gastos · **Nuevo gasto** | orange | Número de factura (opcional) · Fecha · Proveedor · Concepto · Base imponible en € · % de IVA · **Total gasto** · Categoría IRPF | Incluir en el 303 |
+
+**Nuevo gasto** opens from the Gastos list, which has two views: **Por cat. IRPF** (the form opens with that category chosen) and **Por % IVA** (it opens with that rate). Its rules:
+
+- Seguridad Social / RETA → % de IVA 0 %, locked, with the hint "La cuota de autónomos no lleva IVA."
+- IVA 0 % → "Incluir en el 303" off.
+- **Total gasto** (`field__total`: Sans 14 / 700 caps, in the field colour) updates as you type the base.
 
 ## Sizes
 

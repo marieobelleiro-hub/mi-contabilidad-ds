@@ -4,6 +4,7 @@ import { figma } from '../../.storybook/figma.js';
 import { icon } from '../../icons/icons.js';
 import { switchHTML } from '../selectors/selectors.stories.js';
 import { inFrame, frameArgs, mobileFrame, frameRoot } from '../../foundations/mobile-frame.js';
+import { entryForm, wireEntryForm, CAT_OPTS, IVA } from '../input/entry-form.js';
 const ARROW = icon('arrow-right', { size: 'md' });
 const DOWNLOAD = icon('download', { size: 'md' });
 const SAVE = icon('save', { size: 'md' });
@@ -157,7 +158,7 @@ const wireSwitch = (root) => {
 };
 const byType = (type, t) => ({ ...t, if: { arg: 'type', eq: type } });
 export const Playground = {
-  name: 'Playground',
+  name: 'Dialog',
   parameters: { controls: { disable: false } },
   argTypes: {
     view: { name: 'View', control: { type: 'inline-radio', labels: { desktop: 'Desktop', mobile: 'Mobile (390px)' } }, options: ['desktop', 'mobile'] },
@@ -197,6 +198,7 @@ export const Playground = {
 /* ══ The real dialogs of the app, each opened by its button ══ */
 export const AppDialogs = {
   name: 'App dialogs',
+  tags: ['!dev'],
   render: () => {
     const box = document.createElement('div');
     box.style.cssText = 'display:flex;gap:var(--space-16);flex-wrap:wrap';
@@ -245,8 +247,30 @@ export const SaveCopy = {
   render: () => staticBox(saveCopy()),
 };
 
+/* ══ Mobile forms: Nueva factura / Nuevo gasto, the full-screen dialog (docs only) ══ */
+export const MobileForms = {
+  name: 'Mobile forms',
+  tags: ['!dev'],
+  parameters: { layout: 'fullscreen', controls: { disable: false } },
+  argTypes: {
+    form: { name: 'Form', control: { type: 'select', labels: { 'factura-esp': 'Facturación · Nacional', 'factura-ext': 'Facturación · Exenta de impuestos', 'gasto-cat': 'Gastos · from a category (Por cat. IRPF)', 'gasto-iva': 'Gastos · from an IVA rate (Por % IVA)' } }, options: ['factura-esp', 'factura-ext', 'gasto-cat', 'gasto-iva'] },
+    cat: { name: 'Category it opens from', control: { type: 'select', labels: Object.fromEntries(CAT_OPTS.map((c, i) => [String(i), c])) }, options: CAT_OPTS.map((c, i) => String(i)), if: { arg: 'form', eq: 'gasto-cat' } },
+    rate: { name: 'IVA rate it opens from', control: { type: 'inline-radio', labels: Object.fromEntries(IVA.map((r) => [r.split(' ')[0], r])) }, options: IVA.map((r) => r.split(' ')[0]), if: { arg: 'form', eq: 'gasto-iva' } },
+  },
+  args: { form: 'factura-esp', cat: '2', rate: '21' },
+  render: (a) => {
+    if (!inFrame()) return mobileFrame('app-components-dialog--mobile-forms', a, { height: 844, bg: 'white' });
+    a = { ...a, ...frameArgs() };
+    const el = document.createElement('div');
+    el.innerHTML = dialogHTML(entryForm({ form: a.form, cat: Number(a.cat), rate: `${a.rate} %` }));
+    el.querySelector('dialog').setAttribute('open', '');
+    return wireEntryForm(el);
+  },
+};
+
 /* ── Design tab: the matching component in the Figma library ── */
 Playground.parameters = { ...Playground.parameters, design: figma('65:142') };
+MobileForms.parameters = { ...MobileForms.parameters, design: figma('66:281') };
 AppDialogs.parameters = { ...AppDialogs.parameters, design: figma('66:24') };
 Welcome.parameters = { ...Welcome.parameters, design: figma('66:34') };
 Alert.parameters = { ...Alert.parameters, design: figma('66:89') };

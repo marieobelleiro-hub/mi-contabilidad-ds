@@ -1299,6 +1299,8 @@ select.input{
   background-position:right var(--input-pad-x) center;
   cursor:pointer;
 }
+select.input:has(option[value=""]:checked){color:var(--text-muted)}   /* empty dropdown: the first option ("Elige una categoría") reads as a placeholder */
+select.input option{color:var(--text)}
 select.input--sm{padding-right:var(--space-24);background-position:right var(--space-4) center}
 
 /* Textarea */

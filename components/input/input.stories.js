@@ -1,11 +1,10 @@
 // Input stories — HTML + Vite
-// One story per type of input, each with its controls. Every label, value and message is a real one from the app.
+// One story per component, the same as in Figma: Field (text · amount · date · dropdown), Amount · small, Description, Field · inline.
+// Every label, value and message is a real one from the app. The mobile forms are in Dialog.
 // Checkbox / radio / switch → Selectors · cells inside tables → Tables.
 import { figma } from '../../.storybook/figma.js';
 import './input-docs.css';
-import { dialogHTML } from '../dialog/dialog.stories.js';
-import { entryForm, wireEntryForm, CAT_OPTS, IVA } from './entry-form.js';
-import { inFrame, frameArgs, mobileFrame } from '../../foundations/mobile-frame.js';
+import { CAT_OPTS, IVA } from './entry-form.js';
 
 let uid = 0;
 const id = () => `f${++uid}`;
@@ -52,41 +51,7 @@ export const FIELDS = {
 };
 const pick = (k, extra = {}) => { const { msg, hint, ...f } = FIELDS[k]; return fieldHTML({ ...f, ...extra }); };
 
-/* ── Shared controls (same order on every type) ── */
 const T = (category) => ({ table: { category } });
-const COMMON = {
-  tinted: { name: 'Tinted', control: 'boolean', description: 'Tint background: only in the mobile forms', ...T('Style') },
-  accent: { name: 'Colour', control: { type: 'inline-radio', labels: { primary: 'Blue (Facturación, IRPF)', attention: 'Orange (Gastos, IVA)' } }, options: ['primary', 'attention'], if: { arg: 'tinted' }, ...T('Style') },
-  state: { name: 'State', control: { type: 'inline-radio', labels: { default: 'Default', hover: 'Hover', disabled: 'Disabled', focus: 'Focus' } }, options: ['default', 'hover', 'disabled', 'focus'], ...T('Style') },
-  label: { name: 'Label', control: 'text', ...T('Content') },
-  required: { name: 'Required', control: { type: 'inline-radio', labels: { required: 'Required', optional: 'Optional' } }, options: ['required', 'optional'], description: 'Optional adds "(opcional)" in grey next to the label', ...T('Content') },
-  value: { name: 'Text in the field', control: 'text', description: 'Delete it to see the empty field', ...T('Content') },
-  message: { name: 'Message', control: { type: 'inline-radio', labels: { none: 'None', hint: 'Hint (grey)', error: 'Error (red)' } }, options: ['none', 'hint', 'error'], ...T('Message') },
-  hintText: { name: 'Hint text', control: 'text', if: { arg: 'message', eq: 'hint' }, ...T('Message') },
-  errorText: { name: 'Error text', control: 'text', if: { arg: 'message', eq: 'error' }, ...T('Message') },
-};
-/** Default args: every text control starts with the real text of the app (never an empty box). */
-const argsFor = (f, extra = {}) => ({
-  tinted: false, accent: 'primary', state: 'default', label: f.label, required: 'required', value: f.value ?? '',
-  message: 'none', hintText: f.hint || 'Hint text.', errorText: f.msg || REQ, ...extra,
-});
-
-/** Builds the field of a type story from its args. */
-const fromArgs = (base, a, extra = {}) => {
-  const { msg, hint, ...f } = base;
-  return `<div style="width:360px;max-width:100%">${fieldHTML({
-    ...f, ...extra,
-    label: a.label,
-    accent: a.tinted ? a.accent : (extra.accent || 'primary'),
-    tinted: a.tinted,
-    optional: a.required === 'optional',
-    required: a.required === 'required',
-    state: ['hover', 'focus'].includes(a.state) ? a.state : '',
-    disabled: a.state === 'disabled',
-    hint: a.message === 'hint' ? a.hintText : '',
-    error: a.message === 'error' ? a.errorText : '',
-  })}</div>`;
-};
 
 export default {
   title: 'App/Components/Input',
@@ -96,112 +61,92 @@ export default {
   globals: { backgrounds: { value: 'white' } },
 };
 
-/* ── 1 · Text ── */
-export const Text = {
-  name: 'Text',
-  argTypes: { ...COMMON },
-  args: argsFor(FIELDS.proveedor),
-  render: (a) => fromArgs(FIELDS.proveedor, a, { value: a.value }),
+/* ── Field: text, amount, date and dropdown are one component (same as Figma "Field") ── */
+const STATE5 = { name: 'State', control: { type: 'inline-radio', labels: { default: 'Default', hover: 'Hover', error: 'Error', disabled: 'Disabled', focus: 'Focus' } }, options: ['default', 'hover', 'error', 'disabled', 'focus'], ...T('Variant') };
+const COLOUR = { name: 'Colour', control: { type: 'inline-radio', labels: { primary: 'Blue (Facturación, IRPF)', attention: 'Orange (Gastos, IVA)' } }, options: ['primary', 'attention'], description: 'Focus border, checkboxes and total; the tint colour when Tinted', ...T('Variant') };
+const optionsFor = (text) => (IVA.includes(text) ? IVA : CAT_OPTS.includes(text) ? CAT_OPTS : [text]);
+export const Field = {
+  name: 'Field',
+  argTypes: {
+    accent: COLOUR,
+    tinted: { name: 'Tinted', control: 'boolean', description: 'Tint background: only in the mobile forms', ...T('Variant') },
+    value: { name: 'Value', control: { type: 'inline-radio', labels: { filled: 'Filled', empty: 'Empty (grey placeholder)' } }, options: ['filled', 'empty'], ...T('Variant') },
+    state: STATE5,
+    dropdown: { name: 'Dropdown', control: 'boolean', description: 'A list of fixed options, with the chevron (% de IVA, Categoría IRPF)', ...T('Boolean') },
+    optional: { name: 'Optional', control: 'boolean', description: 'Adds "(opcional)" in grey next to the label', ...T('Boolean') },
+    hint: { name: 'Hint', control: 'boolean', description: 'Grey message under the field', ...T('Boolean') },
+    label: { name: 'Label', control: 'text', ...T('Text') },
+    text: { name: 'Text in the field', control: 'text', description: 'The value when Filled · the grey placeholder when Empty', ...T('Text') },
+    hintText: { name: 'Hint text', control: 'text', if: { arg: 'hint' }, ...T('Text') },
+    errorText: { name: 'Error text', control: 'text', description: 'Shown when State is Error', ...T('Text') },
+  },
+  args: { accent: 'primary', tinted: false, value: 'filled', state: 'default', dropdown: false, optional: false, hint: false, label: 'Proveedor', text: 'Jazztel', hintText: 'La cuota de autónomos no lleva IVA.', errorText: REQ },
+  render: (a) => {
+    const empty = a.value === 'empty';
+    const f = a.dropdown
+      ? { type: 'select', options: empty ? [] : optionsFor(a.text), value: empty ? '' : a.text, optionPlaceholder: empty ? a.text : '' }
+      : { value: empty ? '' : a.text, placeholder: empty ? a.text : '' };
+    return `<div style="width:360px;max-width:100%">${fieldHTML({ ...f, label: a.label, accent: a.accent, tinted: a.tinted, optional: a.optional,
+      required: !a.optional, state: ['hover', 'focus'].includes(a.state) ? a.state : '', disabled: a.state === 'disabled',
+      hint: a.hint ? a.hintText : '', error: a.state === 'error' ? a.errorText : '' })}</div>`;
+  },
 };
 
-/* ── 2 · Amount (regular in forms · small in the tax forms) ── */
-const onlyRegular = (t) => ({ ...t, if: { arg: 'size', eq: 'regular' } });
-const onlySmall = (t) => ({ ...t, if: { arg: 'size', eq: 'small' } });
-export const Amount = {
-  name: 'Amount',
+/* ── Amount · small: the two numbers you type in the tax forms ── */
+export const AmountSmall = {
+  name: 'Amount · small',
   argTypes: {
-    size: { name: 'Size', control: { type: 'inline-radio', labels: { regular: 'Regular · 40px (forms)', small: 'Small · 24px (tax forms)' } }, options: ['regular', 'small'], ...T('Style') },
-    tinted: onlyRegular(COMMON.tinted),
-    accent: COMMON.accent,
-    smallAccent: onlySmall({ name: 'Colour', control: { type: 'inline-radio', labels: { primary: 'Blue (Modelo 130)', attention: 'Orange (Modelo 303)' } }, options: ['primary', 'attention'], ...T('Style') }),
-    state: COMMON.state,
-    label: onlyRegular(COMMON.label),
-    required: { ...COMMON.required, description: 'Regular: optional adds "(opcional)" · Small: optional puts a checkbox before the label' },
-    smallLabel: onlySmall({ name: 'Label (required)', control: 'text', description: 'Shown on the left when Required', ...T('Content') }),
-    checkLabel: onlySmall({ name: 'Checkbox text (optional)', control: 'text', description: 'Shown on the left, after the checkbox, when Optional', ...T('Content') }),
-    value: onlyRegular(COMMON.value),
-    smallValue: onlySmall({ ...COMMON.value }),
-    message: onlyRegular(COMMON.message),
-    hintText: COMMON.hintText,
-    errorText: COMMON.errorText,
+    accent: { name: 'Colour', control: { type: 'inline-radio', labels: { primary: 'Blue (Modelo 130)', attention: 'Orange (Modelo 303)' } }, options: ['primary', 'attention'], ...T('Variant') },
+    state: STATE5,
+    optional: { name: 'Optional', control: 'boolean', description: 'A checkbox before the label instead of "(opcional)"', ...T('Boolean') },
+    label: { name: 'Label', control: 'text', if: { arg: 'optional', truthy: false }, ...T('Text') },
+    checkLabel: { name: 'Checkbox text', control: 'text', if: { arg: 'optional' }, ...T('Text') },
+    text: { name: 'Text in the field', control: 'text', ...T('Text') },
   },
-  args: argsFor(FIELDS.base, { size: 'regular', smallAccent: 'attention', smallLabel: 'Importe ingresado en Hacienda', checkLabel: 'Aplicar compensación', smallValue: '151,80' }),
+  args: { accent: 'attention', state: 'default', optional: true, label: 'Importe ingresado en Hacienda', checkLabel: 'Aplicar compensación', text: '151,80' },
   render: (a) => {
-    if (a.size === 'regular') return fromArgs(FIELDS.base, a, { value: a.value });
     const i = id();
     const cls = `input input--sm input--num input--w-sm${['hover', 'focus'].includes(a.state) ? ` is-${a.state}` : ''}`;
-    const optional = a.required === 'optional';
-    const lead = optional
+    const lead = a.optional
       ? `<label class="check"><input type="checkbox" checked> ${a.checkLabel}</label>`
-      : `<label class="row__label" for="${i}">${a.smallLabel}</label>`;
-    return `<div class="field--${a.smallAccent}" style="width:720px;max-width:100%"><div class="list"><div class="row row--kv">
+      : `<label class="row__label" for="${i}">${a.label}</label>`;
+    return `<div class="field--${a.accent}" style="width:720px;max-width:100%"><div class="list"><div class="row row--kv">
       ${lead}
-      <input class="${cls}" id="${i}" value="${a.smallValue}" placeholder="0,00" inputmode="decimal"${optional ? ` aria-label="Importe: ${a.checkLabel}"` : ' aria-required="true"'}${a.state === 'disabled' ? ' disabled' : ''}>
+      <input class="${cls}" id="${i}" value="${a.text}" placeholder="0,00" inputmode="decimal"${a.optional ? ` aria-label="Importe: ${a.checkLabel}"` : ' aria-required="true"'}${a.state === 'error' ? ' aria-invalid="true"' : ''}${a.state === 'disabled' ? ' disabled' : ''}>
     </div></div></div>`;
   },
 };
 
-/* ── 3 · Date ── */
-export const Date_ = {
-  name: 'Date',
-  argTypes: { ...COMMON },
-  args: argsFor(FIELDS.fecha),
-  render: (a) => fromArgs(FIELDS.fecha, a, { value: a.value }),
-};
-
-/* ── 4 · Dropdown ── */
-export const Dropdown = {
-  name: 'Dropdown',
-  argTypes: {
-    variant: { name: 'Variant', control: { type: 'inline-radio', labels: { iva: '% de IVA', cat: 'Categoría IRPF' } }, options: ['iva', 'cat'], ...T('Content') },
-    ...COMMON,
-    label: { ...COMMON.label, if: { arg: 'variant', eq: 'iva' } },
-    catLabel: { ...COMMON.label, if: { arg: 'variant', eq: 'cat' } },
-    value: { name: 'Option selected', control: 'select', options: IVA, if: { arg: 'variant', eq: 'iva' }, ...T('Content') },
-    catValue: { name: 'Option selected', control: { type: 'select', labels: { '': 'Elige una categoría (none yet)' } }, options: ['', ...CAT_OPTS], if: { arg: 'variant', eq: 'cat' }, ...T('Content') },
-  },
-  args: argsFor(FIELDS.iva, { variant: 'iva', catLabel: FIELDS.cat.label, catValue: CAT_OPTS[2], errorText: FIELDS.cat.msg }),
-  render: (a) => fromArgs(FIELDS[a.variant], { ...a, label: a.variant === 'iva' ? a.label : a.catLabel }, { value: a.variant === 'iva' ? a.value : a.catValue }),
-};
-
-/* ── 5 · Description ── */
+/* ── Description: free text over several lines (Notas) ── */
 export const Description = {
   name: 'Description',
   argTypes: {
-    filled: { name: 'Filled background', control: 'boolean', description: 'Grey box (input--filled): the Notas of the tax forms. Off = white, like the other fields', ...T('Style') },
-    tinted: { table: { disable: true } }, accent: { table: { disable: true } },
-    state: COMMON.state, label: COMMON.label, required: COMMON.required,
-    value: { ...COMMON.value, description: 'Starts with the sentence the app shows in the empty field; delete it to see that placeholder' },
-    message: COMMON.message, hintText: COMMON.hintText, errorText: COMMON.errorText,
+    accent: COLOUR,
+    filled: { name: 'Filled background', control: 'boolean', description: 'Grey box (input--filled): the Notas of the tax forms. Off = white, like the other fields', ...T('Variant') },
+    state: STATE5,
+    optional: { name: 'Optional', control: 'boolean', description: 'Adds "(opcional)" in grey next to the label', ...T('Boolean') },
+    label: { name: 'Label', control: 'text', ...T('Text') },
+    text: { name: 'Text in the field', control: 'text', description: 'Starts with the sentence the app shows in the empty field; delete it to see that placeholder', ...T('Text') },
+    errorText: { name: 'Error text', control: 'text', description: 'Shown when State is Error', ...T('Text') },
   },
-  args: argsFor(FIELDS.notas, { filled: true, required: 'optional', value: FIELDS.notas.placeholder }),
-  render: (a) => {
-    const { msg, hint, ...f } = FIELDS.notas;
-    return `<div style="width:360px;max-width:100%">${fieldHTML({ ...f, value: a.value, label: a.label, filled: a.filled,
-      optional: a.required === 'optional', required: a.required === 'required',
-      state: ['hover', 'focus'].includes(a.state) ? a.state : '', disabled: a.state === 'disabled',
-      hint: a.message === 'hint' ? a.hintText : '', error: a.message === 'error' ? a.errorText : '' })}</div>`;
-  },
+  args: { accent: 'attention', filled: true, state: 'default', optional: true, label: FIELDS.notas.label, text: FIELDS.notas.placeholder, errorText: REQ },
+  render: (a) => `<div style="width:360px;max-width:100%">${fieldHTML({ type: 'textarea', placeholder: FIELDS.notas.placeholder, value: a.text === FIELDS.notas.placeholder ? '' : a.text,
+    label: a.label, accent: a.accent, filled: a.filled, optional: a.optional, required: !a.optional,
+    state: ['hover', 'focus'].includes(a.state) ? a.state : '', disabled: a.state === 'disabled', error: a.state === 'error' ? a.errorText : '' })}</div>`,
 };
 
-/* ── Mobile forms (the real full-screen dialog) ── */
-export const MobileForms = {
-  name: 'Mobile forms',
-  parameters: { layout: 'fullscreen' },
+/* ── Field · inline: the label on the left (Cálculo del salario) ── */
+export const Inline = {
+  name: 'Field · inline',
   argTypes: {
-    form: { name: 'Form', control: { type: 'select', labels: { 'factura-esp': 'Facturación · Nacional', 'factura-ext': 'Facturación · Exenta de impuestos', 'gasto-cat': 'Gastos · from a category (Por cat. IRPF)', 'gasto-iva': 'Gastos · from an IVA rate (Por % IVA)' } }, options: ['factura-esp', 'factura-ext', 'gasto-cat', 'gasto-iva'] },
-    cat: { name: 'Category it opens from', control: { type: 'select', labels: Object.fromEntries(CAT_OPTS.map((c, i) => [String(i), c])) }, options: CAT_OPTS.map((c, i) => String(i)), if: { arg: 'form', eq: 'gasto-cat' } },
-    rate: { name: 'IVA rate it opens from', control: { type: 'inline-radio', labels: Object.fromEntries(IVA.map((r) => [r.split(' ')[0], r])) }, options: IVA.map((r) => r.split(' ')[0]), if: { arg: 'form', eq: 'gasto-iva' } },
+    state: STATE5,
+    label: { name: 'Label', control: 'text', ...T('Text') },
+    text: { name: 'Text in the field', control: 'text', ...T('Text') },
+    errorText: { name: 'Error text', control: 'text', description: 'Shown when State is Error', ...T('Text') },
   },
-  args: { form: 'factura-esp', cat: '2', rate: '21' },
-  render: (a) => {
-    if (!inFrame()) return mobileFrame('app-components-input--mobile-forms', a, { height: 844, bg: 'white' });
-    a = { ...a, ...frameArgs() };
-    const el = document.createElement('div');
-    el.innerHTML = dialogHTML(entryForm({ form: a.form, cat: Number(a.cat), rate: `${a.rate} %` }));
-    el.querySelector('dialog').setAttribute('open', '');
-    return wireEntryForm(el);
-  },
+  args: { state: 'default', label: 'Clientes', text: 'Main client', errorText: REQ },
+  render: (a) => `<div style="width:720px;max-width:100%">${fieldHTML({ label: a.label, value: a.text, placeholder: 'Main client', inline: true,
+    state: ['hover', 'focus'].includes(a.state) ? a.state : '', disabled: a.state === 'disabled', error: a.state === 'error' ? a.errorText : '' })}</div>`,
 };
 
 /* ── Illustrations (no controls) ── */
@@ -209,6 +154,20 @@ const ILL = { controls: { disable: true } };
 const HIDDEN = ['!dev'];   // only shown inside the Input page, not in the sidebar
 const cell = (cap, html) => `<figure class="ifig__cell"><figcaption class="ifig__cap">${cap}</figcaption>${html}</figure>`;
 const fig = (cells, cols = 3) => `<div class="ifig" style="--ifig-cols:${cols}">${cells.join('')}</div>`;
+
+export const Types = {
+  name: 'Illustration · Types',
+  tags: HIDDEN,
+  parameters: ILL,
+  render: () => fig([
+    cell('Text', pick('proveedor')),
+    cell('Amount', pick('base')),
+    cell('Date · empty', pick('fecha', { value: '' })),
+    cell('Dropdown', pick('iva')),
+    cell('Dropdown · empty', pick('cat', { value: '' })),
+    cell('Optional · empty', pick('num', { value: '', optional: true })),
+  ]),
+};
 
 export const Anatomy = {
   name: 'Illustration · Anatomy',
@@ -249,12 +208,11 @@ export const Colour = {
 };
 
 /* ── Design tab: the matching component in the Figma library ── */
-Text.parameters = { ...Text.parameters, design: figma('37:162') };
-Amount.parameters = { ...Amount.parameters, design: figma('36:163') };
-Date_.parameters = { ...Date_.parameters, design: figma('37:162') };
-Dropdown.parameters = { ...Dropdown.parameters, design: figma('37:162') };
+Field.parameters = { ...Field.parameters, design: figma('37:162') };
+AmountSmall.parameters = { ...AmountSmall.parameters, design: figma('36:163') };
 Description.parameters = { ...Description.parameters, design: figma('36:142') };
-MobileForms.parameters = { ...MobileForms.parameters, design: figma('118:164') };
+Inline.parameters = { ...Inline.parameters, design: figma('36:184') };
+Types.parameters = { ...Types.parameters, design: figma('35:9') };
 Anatomy.parameters = { ...Anatomy.parameters, design: figma('37:162') };
 States.parameters = { ...States.parameters, design: figma('37:162') };
 Colour.parameters = { ...Colour.parameters, design: figma('37:162') };

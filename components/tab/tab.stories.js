@@ -65,32 +65,55 @@ const COLOUR = { name: 'Colour', control: { type: 'inline-radio', labels: { bran
 const VIEW = { name: 'View', control: { type: 'inline-radio', labels: { desktop: 'Desktop · tab', mobile: 'Mobile · selector (with chevron)' } }, options: ['desktop', 'mobile'] };
 const boxed = (el) => { const d = document.createElement('div'); d.style.cssText = 'min-height:240px'; d.append(el); return d; };
 
+const NO_TAB_ARGS = Object.fromEntries(['label', 'accent', 'outline', 'width', 'active', 'disabled', 'role'].map((k) => [k, { table: { disable: true } }]));
+
 export const Playground = {
-  name: 'Page tabs',
-  render: (a) => (a.view === 'mobile'
-    ? boxed(menuSelector({ items: [a.label], current: 0, ariaLabel: 'Secciones', name: 'Sección', classes: () => `tab--${a.accent}${a.outline ? ' tab--outline' : ''}` }))
-    : (a.role === 'nav'
-      ? `<nav aria-label="Secciones" class="tab-list">${tabHTML(a)}</nav>`
-      : `<div class="tab-list" role="tablist" aria-label="Ejemplo">${tabHTML(a)}</div>`)),
-  argTypes: {
-    view: VIEW,
-    label: { name: 'Label', control: 'text' },
-    accent: COLOUR,
-    outline: { name: 'Outline', control: 'boolean', description: 'Active state as a 2px outline (IVA, IRPF)' },
-    width: { name: 'Width', control: 'inline-radio', options: ['auto', 'fixed'], description: 'auto = fits the label · fixed = 160px', if: { arg: 'view', eq: 'desktop' } },
-    active: { name: 'Active', control: 'boolean', if: { arg: 'view', eq: 'desktop' } },
-    disabled: { name: 'Disabled', control: 'boolean', if: { arg: 'view', eq: 'desktop' } },
-    role: { name: 'Role', control: 'inline-radio', options: ['tab', 'nav'], description: 'tab = switches content · nav = goes to a page', if: { arg: 'view', eq: 'desktop' } },
+  name: 'Tab',
+  render: (a) => {
+    const html = tabHTML({ ...a, active: a.state === 'active', disabled: a.state === 'disabled' })
+      .replace('class="tab ', `class="tab${a.state === 'hover' ? ' is-hover' : a.state === 'focus' ? ' is-focus' : ''} `);
+    return a.role === 'nav' ? `<nav aria-label="Secciones" class="tab-list">${html}</nav>` : `<div class="tab-list" role="tablist" aria-label="Ejemplo">${html}</div>`;
   },
-  args: { view: 'desktop', label: 'Page name', accent: 'attention', outline: false, width: 'auto', active: true, disabled: false, role: 'tab' },
+  argTypes: {
+    accent: { ...COLOUR, control: { type: 'inline-radio', labels: { ...COLOUR.control.labels, neutral: 'Grey (periods on mobile)' } }, options: [...COLOUR.options, 'neutral'], table: { category: 'Variant' } },
+    outline: { name: 'Style · outline', control: 'boolean', description: 'Active state as a 2px outline (IVA, IRPF)', table: { category: 'Variant' } },
+    state: { name: 'State', control: { type: 'inline-radio', labels: { active: 'Active', default: 'Default', hover: 'Hover', disabled: 'Disabled', focus: 'Focus' } }, options: ['active', 'default', 'hover', 'disabled', 'focus'], table: { category: 'Variant' } },
+    width: { name: 'Width', control: 'inline-radio', options: ['auto', 'fixed'], description: 'auto = fits the label · fixed = 160px (period tabs, view toggle)', table: { category: 'Variant' } },
+    role: { name: 'Role', control: 'inline-radio', options: ['tab', 'nav'], description: 'tab = switches content · nav = goes to a page (sidebar)', table: { category: 'Code' } },
+    label: { name: 'Label', control: 'text', table: { category: 'Text' } },
+    active: { table: { disable: true } }, disabled: { table: { disable: true } },
+  },
+  args: { accent: 'primary', outline: false, state: 'active', width: 'auto', role: 'tab', label: 'Facturación' },
+};
+
+/* ── Tab · selector: on mobile the tab strip becomes one tab that opens a menu ── */
+export const TabSelector = {
+  name: 'Tab · selector',
+  parameters: { layout: 'padded' },
+  render: (a) => {
+    const periods = a.accent === 'neutral';
+    const el = periods ? periodSelector(0) : menuSelector({ items: [a.label], current: 0, ariaLabel: 'Secciones', name: 'Sección', classes: () => `tab--${a.accent}${a.outline ? ' tab--outline' : ''}` });
+    if (!periods) el.querySelector('.tab--menu').classList.add(`tab--${a.accent}`);
+    if (a.outline && !periods) el.querySelector('.tab--menu').classList.add('tab--outline');
+    if (a.open) requestAnimationFrame(() => el.querySelector('.tab--menu').click());
+    return boxed(el);
+  },
+  argTypes: {
+    ...NO_TAB_ARGS,
+    accent: { ...COLOUR, control: { type: 'inline-radio', labels: { ...COLOUR.control.labels, neutral: 'Grey (periods)' } }, options: [...COLOUR.options, 'neutral'], table: { category: 'Variant' } },
+    outline: { name: 'Style · outline', control: 'boolean', if: { arg: 'accent', neq: 'neutral' }, table: { category: 'Variant' } },
+    open: { name: 'Open', control: 'boolean', description: 'The menu below, with every section (or period)', table: { category: 'Variant' } },
+    label: { name: 'Label', control: 'text', if: { arg: 'accent', neq: 'neutral' }, table: { category: 'Text' } },
+  },
+  args: { accent: 'primary', outline: false, open: false, label: 'Facturación' },
 };
 
 /* ── Real cases (each one has its controls) ── */
 const TYPE = { name: 'Type', control: { type: 'inline-radio', labels: { primary: 'Facturación / IRPF (blue)', attention: 'Gastos / IVA (orange)' } }, options: ['primary', 'attention'] };
-const NO_TAB_ARGS = Object.fromEntries(['label', 'accent', 'outline', 'width', 'active', 'disabled', 'role'].map((k) => [k, { table: { disable: true } }]));
 
 export const PeriodTabs = {
   name: 'Period tabs',
+  tags: ['!dev'],   // docs only: tabs (fixed width) in a row
   parameters: { layout: 'padded' },
   render: ({ view, type, period }) => (view === 'mobile'
     ? boxed(periodSelector(PERIODS.indexOf(period)))
@@ -102,6 +125,7 @@ export const PeriodTabs = {
 const VIEWS = ['Por cat. IRPF', 'Por % IVA'];
 export const ViewToggle = {
   name: 'View toggle',
+  tags: ['!dev'],   // docs only: two fixed tabs
   render: ({ view }) => tabList({ labels: VIEWS, selected: VIEWS.indexOf(view), accent: 'attention', width: 'fixed', ariaLabel: 'Ordenar gastos' }),
   argTypes: { ...NO_TAB_ARGS, view: { name: 'Selected', control: 'inline-radio', options: VIEWS } },
   args: { view: VIEWS[0] },
@@ -199,7 +223,6 @@ export const YEAR_INFO = { now: NOW, years: YEARS, active: ACTIVE };
 
 export const YearStrip = {
   name: 'Year strip',
-  tags: ['!dev'],   // docs only
   parameters: { layout: 'padded' },
   render: ({ selected = NOW } = {}) => {
     const sel = ACTIVE.includes(Number(selected)) ? Number(selected) : NOW;   // always exactly one selected
@@ -288,13 +311,14 @@ export const PeriodSelector = {
 
 /* ── Design tab: the matching component in the Figma library ── */
 Playground.parameters = { ...Playground.parameters, design: figma('23:109') };
-PeriodTabs.parameters = { ...PeriodTabs.parameters, design: figma('23:121') };
+TabSelector.parameters = { ...TabSelector.parameters, design: figma('20:135') };
+PeriodTabs.parameters = { ...PeriodTabs.parameters, design: figma('23:109') };
 ViewToggle.parameters = { ...ViewToggle.parameters, design: figma('20:135') };
-SidebarNav.parameters = { ...SidebarNav.parameters, design: figma('23:110') };
+SidebarNav.parameters = { ...SidebarNav.parameters, design: figma('23:109') };
 States.parameters = { ...States.parameters, design: figma('23:109') };
 Mobile.parameters = { ...Mobile.parameters, design: figma('20:135') };
 YearTab.parameters = { ...YearTab.parameters, design: figma('24:56') };
 YearStrip.parameters = { ...YearStrip.parameters, design: figma('24:57') };
 YearStates.parameters = { ...YearStates.parameters, design: figma('24:56') };
-Selector.parameters = { ...Selector.parameters, design: figma('23:110') };
-PeriodSelector.parameters = { ...PeriodSelector.parameters, design: figma('23:121') };
+Selector.parameters = { ...Selector.parameters, design: figma('20:135') };
+PeriodSelector.parameters = { ...PeriodSelector.parameters, design: figma('20:135') };

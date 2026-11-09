@@ -355,7 +355,14 @@ export const TaxForms = {
 };
 
 /* For the Showcase */
-export const showcaseTables = () => `${factDesktop({ table: 'esp', state: 'editable' })}<div style="height:var(--space-16)"></div>${taxFormHTML({ tax: 'iva', result: 'pay', compensacion: true })}<div style="height:var(--space-16)"></div>${sumDesktop({ tax: 'iva' })}`;
+/** For the Showcase: one example of each table, named as in the sidebar */
+export const showcaseTables = (block) => [
+  block('Facturación', factDesktop({ table: 'esp', state: 'editable' })),
+  block('Gastos', gastoDesktop({ list: 'cat', cat: 'sum', rate: '21', state: 'editable' })),
+  block('Últimas facturas', lastDraw()),
+  block('Resumen anual', sumDesktop({ tax: 'iva' })),
+  block('Tax forms', taxFormHTML({ tax: 'iva', result: 'pay', compensacion: true })),
+].join('');
 
 /* ── Design tab: the matching component in the Figma library ── */
 Facturacion.parameters = { ...Facturacion.parameters, design: figma('42:1211') };

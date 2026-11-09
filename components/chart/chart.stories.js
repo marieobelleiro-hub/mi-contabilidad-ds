@@ -33,7 +33,7 @@ export default {
 };
 
 export const Line = {
-  name: 'Line · Ingresos vs Gastos',
+  name: 'Chart · Line',
   render: () => inCard('Comparativa Ingresos · Gastos', lineChart, {
     labels: MONTHS,
     series: [{ name: 'Ingresos', color: 'var(--chart-1)', values: ING }, { name: 'Gastos', color: 'var(--chart-2)', values: GAS }],
@@ -41,7 +41,7 @@ export const Line = {
 };
 
 export const Bars = {
-  name: 'Bars · This year vs last year',
+  name: 'Chart · Bars',
   render: () => inCard('Comparativa salario neto', barChart, {
     labels: MONTHS,
     series: [{ name: '2025', color: 'var(--chart-compare)', values: SAL_PREV }, { name: '2026', color: 'var(--chart-1)', values: SAL_CUR }],
@@ -56,11 +56,13 @@ export const distributionHTML = () => `<section class="card card--attention" sty
 
 export const Distribution = {
   name: 'Horizontal bars · Distribución del gasto',
+  tags: ['!dev'],   // docs only
   render: () => distributionHTML(),
 };
 
 export const Dashboard = {
   name: 'In context · Dashboard row',
+  tags: ['!dev'],   // docs only
   render: () => {
     const grid = document.createElement('div');
     grid.className = 'card-grid card-grid--2';
@@ -73,6 +75,7 @@ export const Dashboard = {
 
 export const Mobile = {
   name: 'Overview · Mobile',
+  tags: ['!dev'],   // docs only
   globals: { ...ON_CANVAS.globals, viewport: { value: 'mobile' } },
   render: () => inCard('Comparativa Ingresos · Gastos', lineChart, {
     labels: MONTHS,

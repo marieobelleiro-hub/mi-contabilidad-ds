@@ -114,7 +114,7 @@ export const Status = {
 };
 
 export const Switch = {
-  name: 'Switch / toggle',
+  name: 'Switch',
   render: (args) => live(switchHTML(args)),
   argTypes: {
     state: STATE(['default', 'disabled', 'focus']),
@@ -128,7 +128,7 @@ export const Switch = {
 };
 
 export const Chip = {
-  name: 'Chip (static)',
+  name: 'Chip',
   render: (args) => chipHTML(args),
   argTypes: {
     variant: { name: 'Type', control: { type: 'inline-radio', labels: { brand: 'Brand (green outline)', code: 'Code (grey)' } }, options: ['brand', 'code'], table: { category: 'Variant' } },
@@ -205,5 +205,5 @@ ChoiceGroup.parameters = { ...ChoiceGroup.parameters, design: figma('66:191') };
 Switch.parameters = { ...Switch.parameters, design: figma('27:34') };
 Chip.parameters = { ...Chip.parameters, design: figma('27:70') };
 States.parameters = { ...States.parameters, design: figma('26:3') };
-StatusOverview.parameters = { ...StatusOverview.parameters, design: figma('27:41') };
+StatusOverview.parameters = { ...StatusOverview.parameters, design: figma('27:65') };
 InContext.parameters = { ...InContext.parameters, design: figma('26:3') };

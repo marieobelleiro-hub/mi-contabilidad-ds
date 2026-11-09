@@ -17,6 +17,8 @@ You are building screens for **Mi Contabilidad**, an accounting app for freelanc
 
 ## Rules (always)
 
+0. **One component = one Storybook entry = one Figma component, with the same name and the same properties.** The sidebar lists only components (30 today); each one has one playground with all its controls. Real cases, states and "in the app" views are docs-only stories (`tags: ['!dev']`) on the component's docs page. Figma building blocks that are not components on their own start with `_` (hidden from the library). The Showcase lists the same components, group by group.
+
 1. **Tokens only.** Never write a raw colour, size, weight, line height, duration or z-index. Always `var(--token)`. `npm run lint` fails otherwise.
 2. **Use role tokens, not the palette.** `--primary`, `--attention`, `--income`, `--expense`, `--text`, `--surface`… never `--blue`, `--orange`, `--gray-*` in components. Exception: `--white` / `--black` for text on a coloured background.
 3. **Two action colours.**

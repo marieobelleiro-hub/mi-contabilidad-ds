@@ -87,6 +87,7 @@ const responsive = (storyId, draw) => ({ view }) => {
 
 export const Dashboard = {
   name: 'Dashboard',
+  tags: ['!dev'],   // docs only: the KPI card in the app
   parameters: { layout: 'padded', controls: { disable: true } },
   render: () => `<div class="card-grid card-grid--2" style="max-width:1108px">
     ${kpiCardHTML({ label: 'Salario neto del mes', labelColor: 'primary', amount: '5.221,69 €', sub: 'En base al beneficio neto del mes anterior', info: true })}
@@ -98,6 +99,7 @@ export const Dashboard = {
 
 export const Facturacion = {
   name: 'Facturación',
+  tags: ['!dev'],   // docs only: the KPI card in the app
   parameters: { layout: 'padded' },
   ...VIEW,
   render: responsive('app-components-card--facturacion', () => grid4([
@@ -110,6 +112,7 @@ export const Facturacion = {
 
 export const Gastos = {
   name: 'Gastos',
+  tags: ['!dev'],   // docs only: the KPI card in the app
   parameters: { layout: 'padded' },
   ...VIEW,
   render: responsive('app-components-card--gastos', () => grid4([
@@ -122,6 +125,7 @@ export const Gastos = {
 
 export const IrpfPeriods = {
   name: 'IRPF · Periods',
+  tags: ['!dev'],   // docs only: the KPI card in the app
   parameters: { layout: 'padded' },
   ...VIEW,
   render: responsive('app-components-card--irpf-periods', () => grid4([
@@ -134,6 +138,7 @@ export const IrpfPeriods = {
 
 export const Salario = {
   name: 'Container · Cálculo del salario',
+  tags: ['!dev'],   // docs only: the container card (a building block, _Container card in Figma)
   parameters: { layout: 'padded' },
   ...VIEW,
   render: responsive('app-components-card--salario', () => `<section class="card card--primary" style="max-width:1108px" aria-labelledby="sal-t">

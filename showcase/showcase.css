@@ -33,6 +33,9 @@
 .sc__label{font-family:var(--font-mono);font-size:var(--text-10);text-transform:uppercase;letter-spacing:var(--ls-caps);color:var(--text-muted)}
 .sc__items{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-16);min-width:0}
 .sc__grid{display:grid;gap:var(--space-16)}
+.sc__stack{display:flex;flex-direction:column;gap:var(--space-16)}
+.sc__block{display:flex;flex-direction:column;gap:var(--space-8);margin-bottom:var(--space-24)}
+.sc__block:last-child{margin-bottom:0}
 .sc__grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .sc__grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .sc__grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}

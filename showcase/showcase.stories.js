@@ -3,10 +3,9 @@
 import './showcase.css';
 import { version } from '../package.json';
 import { bigHTML, ghostHTML, iconButtonHTML, fabHTML } from '../components/button/button.stories.js';
-import { tabHTML, YearStrip } from '../components/tab/tab.stories.js';
+import { tabHTML, YearStrip, yearTabHTML, sectionSelector, periodSelector } from '../components/tab/tab.stories.js';
 import { chipHTML, statusHTML, checkHTML, switchHTML, choiceHTML } from '../components/selectors/selectors.stories.js';
 import { kpiCardHTML } from '../components/card/card.stories.js';
-import { distributionHTML } from '../components/chart/chart.stories.js';
 import { showcaseTables } from '../components/table/table.stories.js';
 import { fieldHTML, FIELDS } from '../components/input/input.stories.js';
 import { bannerHTML } from '../components/feedback/feedback.stories.js';
@@ -27,16 +26,18 @@ const FOUNDATIONS = [
   ['icons', 'Icons', 'app-foundations-icons--docs'],
 ];
 const COMPONENTS = [
-  ['button', 'Button', 'app-components-button--button', 'Big, ghost, icon and floating · their states'],
-  ['tab', 'Tab', 'app-components-tab--tab', 'Navigation, period tabs, view toggle, year tab'],
-  ['selectors', 'Selectors', 'app-components-selectors--selectors', 'Checkbox & radio, choice card, status dot, switch / toggle, chips'],
-  ['card', 'Card', 'app-components-card--card', 'The white block: KPI card and container card'],
-  ['input', 'Input', 'app-components-input--input', 'Fields, select, description, small amounts (tax forms)'],
-  ['table', 'Tables', 'app-components-tables--tables', 'Facturación, Gastos, Últimas facturas, Resumen anual, tax forms'],
-  ['feedback', 'Banner, tooltip & toast', 'app-components-banner-tooltip-toast--feedback', 'Messages and pop-ups'],
-  ['dialog', 'Dialog', 'app-components-dialog--dialog', 'Welcome, alerts and forms'],
-  ['chart', 'Chart', 'app-components-chart--chart', 'Line, bar and horizontal bar charts'],
+  // [id, group, docs, the components of the group = the entries of the sidebar = the Figma components]
+  ['button', 'Button', 'app-components-button--button', ['Big button', 'Ghost button', 'Icon button', 'Floating button']],
+  ['tab', 'Tab', 'app-components-tab--tab', ['Tab', 'Tab · selector', 'Year tab', 'Year strip']],
+  ['selectors', 'Selectors', 'app-components-selectors--selectors', ['Checkbox & radio', 'Choice card', 'Status dot', 'Switch', 'Chip']],
+  ['card', 'Card', 'app-components-card--card', ['KPI card']],
+  ['input', 'Input', 'app-components-input--input', ['Field', 'Amount · small', 'Description', 'Field · inline']],
+  ['table', 'Tables', 'app-components-tables--tables', ['Facturación', 'Gastos', 'Últimas facturas', 'Resumen anual', 'Tax forms']],
+  ['feedback', 'Banner, tooltip & toast', 'app-components-banner-tooltip-toast--feedback', ['Banner', 'Tooltip', 'Chart tooltip', 'Toast']],
+  ['dialog', 'Dialog', 'app-components-dialog--dialog', ['Dialog']],
+  ['chart', 'Chart', 'app-components-chart--chart', ['Chart · Line', 'Chart · Bars']],
 ];
+const COMPONENT_COUNT = COMPONENTS.reduce((n, c) => n + c[3].length, 0);
 
 const section = (id, title, docsId, lead, body, canvas = false) => `
   <section class="sc__section" id="sc-${id}" aria-labelledby="sc-${id}-t">
@@ -48,6 +49,8 @@ const section = (id, title, docsId, lead, body, canvas = false) => `
   </section>`;
 const row = (label, items) => `<div class="sc__row"><span class="sc__label">${label}</span><div class="sc__items">${items.join('')}</div></div>`;
 const slot = (name) => `<div data-slot="${name}"></div>`;
+/** A component on a canvas panel (cards, tables, charts): its name, then the component */
+const block = (label, html) => `<div class="sc__block"><span class="sc__label">${label}</span>${html}</div>`;
 
 /* ── Foundations ──────────────────────────────────────────────────────────── */
 const swatch = (token, label) => `<div class="sc__swatch"><i style="background:var(${token})"></i><b>${label}</b><span>${token}</span></div>`;
@@ -95,53 +98,50 @@ const icons = `
 /* ── Components ───────────────────────────────────────────────────────────── */
 const C = {
   button: `
-    ${row('Big', [bigHTML({ label: 'Continuar' }), bigHTML({ colour: 'attention', label: 'Guardar', icon: 'save' }), bigHTML({ label: 'Entendido', showIcon: false }), bigHTML({ label: 'Guardar', state: 'disabled' })])}
-    ${row('Ghost', [ghostHTML({ label: 'Añadir factura' }), ghostHTML({ colour: 'attention', label: 'Añadir gasto' }), ghostHTML({ label: 'Ver todas las facturas', showIcon: false }), ghostHTML({ label: 'Cancelar', showIcon: false, state: 'disabled' })])}
-    ${row('Icon', [iconButtonHTML({ label: 'Más información' }), iconButtonHTML({ kind: 'danger', icon: 'trash', label: 'Eliminar gasto' }), iconButtonHTML({ kind: 'danger', icon: 'close-filled', label: 'Eliminar factura' }), iconButtonHTML({ kind: 'danger', icon: 'close', size: 'md', label: 'Cerrar' }), iconButtonHTML({ kind: 'danger', icon: 'trash', label: 'Eliminar', state: 'disabled' })])}
-    ${row('Floating', [fabHTML({}), fabHTML({ state: 'open' }), fabHTML({ style: 'filled', icon: 'accessibility' }), fabHTML({ style: 'filled', icon: 'accessibility', state: 'open' })])}`,
+    ${row('Big button', [bigHTML({ label: 'Continuar' }), bigHTML({ colour: 'attention', label: 'Guardar', icon: 'save' }), bigHTML({ label: 'Entendido', showIcon: false }), bigHTML({ label: 'Guardar', state: 'disabled' })])}
+    ${row('Ghost button', [ghostHTML({ label: 'Añadir factura' }), ghostHTML({ colour: 'attention', label: 'Añadir gasto' }), ghostHTML({ label: 'Ver todas las facturas', showIcon: false }), ghostHTML({ label: 'Cancelar', showIcon: false, state: 'disabled' })])}
+    ${row('Icon button', [iconButtonHTML({ label: 'Más información' }), iconButtonHTML({ kind: 'danger', icon: 'trash', label: 'Eliminar gasto' }), iconButtonHTML({ kind: 'danger', icon: 'close-filled', label: 'Eliminar factura' }), iconButtonHTML({ kind: 'danger', icon: 'close', size: 'md', label: 'Cerrar' }), iconButtonHTML({ kind: 'danger', icon: 'trash', label: 'Eliminar', state: 'disabled' })])}
+    ${row('Floating button', [fabHTML({}), fabHTML({ state: 'open' }), fabHTML({ style: 'filled', icon: 'accessibility' }), fabHTML({ style: 'filled', icon: 'accessibility', state: 'open' })])}`,
   tab: `
-    ${row('Accents', [['brand', 'Dashboard', 'Facturación'], ['primary', 'Facturación', 'Gastos'], ['attention', 'Gastos', 'IVA']].map(([a, on, off]) => `<div class="tab-list" role="tablist" aria-label="${on}">${tabHTML({ label: on, accent: a, active: true })}${tabHTML({ label: off, accent: a })}</div>`))}
-    ${row('Outline', ['primary', 'attention'].map((a) => `<div class="tab-list" role="tablist" aria-label="${a} outline">${tabHTML({ label: a === 'primary' ? 'IRPF' : 'IVA', accent: a, outline: true, active: true })}${tabHTML({ label: a === 'primary' ? 'IVA' : 'IRPF', accent: a })}</div>`))}
-    ${row('Period tabs', [`<div class="tab-list" role="tablist" aria-label="Período">${['Resumen anual', '1T · Ene–Mar', '2T · Abr–Jun', '3T · Jul–Sep'].map((l, i) => tabHTML({ label: l, accent: 'primary', width: 'fixed', active: !i })).join('')}</div>`])}
-    ${row('Year tab', [slot('years')])}`,
+    ${row('Tab', [['brand', 'Dashboard', 'Facturación'], ['primary', 'Facturación', 'Gastos'], ['attention', 'Gastos', 'IVA']].map(([a, on, off]) => `<div class="tab-list" role="tablist" aria-label="${on}">${tabHTML({ label: on, accent: a, active: true })}${tabHTML({ label: off, accent: a })}</div>`).concat(['primary', 'attention'].map((a) => `<div class="tab-list" role="tablist" aria-label="${a} outline">${tabHTML({ label: a === 'primary' ? 'IRPF' : 'IVA', accent: a, outline: true, active: true })}${tabHTML({ label: a === 'primary' ? 'IVA' : 'IRPF', accent: a })}</div>`)))}
+    ${row('Tab · selector', [slot('sel-section'), slot('sel-period')])}
+    ${row('Year tab', [['selected', 2026], ['unselected', 2025], ['disabled', 2027]].map(([st, y]) => `<div class="year-strip" role="tablist" aria-label="Año ${st}" style="width:120px">${yearTabHTML({ year: y, state: st })}</div>`))}
+    ${row('Year strip', [slot('years')])}`,
   selectors: `
     ${row('Checkbox & radio', [checkHTML({ label: 'Aplicar retención IRPF del 15 %' }), checkHTML({ type: 'attention', label: 'Aplicar compensación', checked: false }), checkHTML({ type: 'attention', size: 'sm', label: 'Incluir en el 303' }), checkHTML({ kind: 'radio', label: 'Versión actual (con datos)', name: 'sc-r' }), checkHTML({ type: 'attention', label: 'Incluir en el 303', state: 'disabled', checked: false })])}
     ${row('Choice card', [`<div class="sc__grid sc__grid--2 field--primary" style="flex:1">${choiceHTML({ name: 'sc-ch' })}${choiceHTML({ name: 'sc-ch', title: 'Versión vacía (sin datos)', desc: 'Para empezar desde cero.', checked: false })}${choiceHTML({ kind: 'checkbox', title: 'Versión actual (con datos)' })}${choiceHTML({ kind: 'checkbox', title: 'Versión vacía (sin datos)', desc: 'Para empezar desde cero.', checked: false })}</div>`])}
     ${row('Status dot', [statusHTML({ state: 'paid', mode: 'button' }), statusHTML({ state: 'pending', mode: 'button' }), statusHTML({ state: 'paid', mode: 'label' }), statusHTML({ state: 'pending', mode: 'label' })])}
-    ${row('Switch / toggle', [switchHTML({}), switchHTML({ checked: true }), switchHTML({ showLabels: false })])}
-    ${row('Chip (static)', [chipHTML({ label: 'Contabilidad' }), chipHTML({ label: 'Demo' }), chipHTML({ variant: 'code', label: 'c.01' }), chipHTML({ variant: 'code', label: 'c.28' })])}`,
-  card: `
+    ${row('Switch', [switchHTML({}), switchHTML({ checked: true }), switchHTML({ showLabels: false })])}
+    ${row('Chip', [chipHTML({ label: 'Contabilidad' }), chipHTML({ label: 'Demo' }), chipHTML({ variant: 'code', label: 'c.01' }), chipHTML({ variant: 'code', label: 'c.28' })])}`,
+  card: block('KPI card', `
     <div class="sc__grid sc__grid--4">
       ${kpiCardHTML({ label: 'IVA a pagar', labelColor: 'attention', amount: '1.778,23 €', sub: 'Vence 20 de octubre', interactive: true })}
       ${kpiCardHTML({ label: 'Total facturado', amount: '50.790,36 €', amountColor: 'primary', sub: 'Base imponible' })}
       ${kpiCardHTML({ label: 'Pendiente de cobro', amount: '7.406,63 €', amountColor: 'attention', sub: '2 facturas' })}
       ${kpiCardHTML({ label: 'IRPF acumulado (3T)', amount: '3.508,86 €', amountColor: 'primary', showSub: false, state: 'selected' })}
-    </div>`,
-  table: showcaseTables(),
-  input: `<div class="sc__grid sc__grid--3">
-      <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ ...FIELDS.cliente, value: '' })}${fieldHTML({ ...FIELDS.fecha, value: '31/09/2026', error: FIELDS.fecha.msg })}${fieldHTML({ ...FIELDS.iva, value: '0 %', disabled: true, hint: 'La cuota de autónomos no lleva IVA.' })}</div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ ...FIELDS.proveedor, tinted: true, accent: 'attention' })}${fieldHTML({ ...FIELDS.base, tinted: true, accent: 'attention' })}</div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ label: FIELDS.notas.label, type: 'textarea', placeholder: FIELDS.notas.placeholder, filled: true, optional: true, accent: 'attention' })}</div>
-    </div>
-    ${row('Small · tax forms', [`<div class="field--attention" style="width:720px;max-width:100%"><div class="list">
+    </div>`),
+  table: showcaseTables(block),
+  input: `
+    ${row('Field', [`<div class="sc__grid sc__grid--3" style="flex:1">
+      <div class="sc__stack">${fieldHTML({ ...FIELDS.proveedor })}${fieldHTML({ ...FIELDS.base, value: '37,65' })}</div>
+      <div class="sc__stack">${fieldHTML({ ...FIELDS.fecha, value: '31/09/2026', error: FIELDS.fecha.msg })}${fieldHTML({ label: FIELDS.num.label, optional: true })}</div>
+      <div class="sc__stack">${fieldHTML({ ...FIELDS.iva, hint: '' })}${fieldHTML({ ...FIELDS.cat, value: '' })}${fieldHTML({ ...FIELDS.proveedor, tinted: true, accent: 'attention' })}</div>
+    </div>`])}
+    ${row('Amount · small', [`<div class="field--attention" style="width:720px;max-width:100%"><div class="list">
       <div class="row row--kv"><label class="row__label" for="sc-sm1">Importe ingresado en Hacienda</label><input class="input input--sm input--num input--w-sm" id="sc-sm1" value="" placeholder="0,00" inputmode="decimal" aria-required="true"></div>
       <div class="row row--kv"><label class="check"><input type="checkbox" checked> Aplicar compensación</label><input class="input input--sm input--num input--w-sm" value="151,80" placeholder="0,00" inputmode="decimal" aria-label="Importe: Aplicar compensación"></div>
-    </div></div>`])}`,
-  feedback: `<div class="sc__grid sc__grid--2">
-      <div style="display:flex;flex-direction:column;gap:var(--space-12)">
-        ${bannerHTML({ type: 'warning', text: 'Sin facturación española → IVA soportado no deducible este trimestre.' })}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-16)">
-        <div class="tooltip" role="tooltip" style="position:static;width:auto">El salario neto es calculado con esas facturas, restando los gastos del mes anterior, independientemente de si los pagos se hayan realizado.</div>
-        <div class="tooltip tooltip--dark" role="tooltip" style="position:static;align-self:flex-start"><b>Julio</b><br><span class="tooltip__swatch" style="background:var(--income-light)"></span>Ingresos <b>8.203,35 €</b></div>
-        <div class="toast toast--inline" role="status"><span>Factura 411 eliminada.</span><button type="button" class="toast__action">Deshacer</button></div>
-      </div>
-    </div>`,
-  dialog: `<div style="max-width:400px">${DialogAlert.render().outerHTML}</div>`,
+    </div></div>`])}
+    ${row('Description', [`<div style="width:360px;max-width:100%">${fieldHTML({ label: FIELDS.notas.label, type: 'textarea', placeholder: FIELDS.notas.placeholder, filled: true, optional: true, accent: 'attention' })}</div>`])}
+    ${row('Field · inline', [`<div style="width:720px;max-width:100%">${fieldHTML({ label: 'Clientes', value: 'Main client', inline: true })}</div>`])}`,
+  feedback: `
+    ${row('Banner', [`<div style="flex:1;max-width:720px">${bannerHTML({ type: 'warning', text: 'Sin facturación española → IVA soportado no deducible este trimestre.' })}</div>`])}
+    ${row('Tooltip', [`<div class="tooltip" role="tooltip" style="position:static;width:auto;max-width:480px">El salario neto es calculado con esas facturas, restando los gastos del mes anterior, independientemente de si los pagos se hayan realizado.</div>`])}
+    ${row('Chart tooltip', [`<div class="tooltip tooltip--dark" role="tooltip" style="position:static"><b>Julio</b><br><span class="tooltip__swatch" style="background:var(--income-light)"></span>Ingresos <b>8.203,35 €</b><br><span class="tooltip__swatch" style="background:var(--expense-light)"></span>Gastos <b>1.072,54 €</b></div>`])}
+    ${row('Toast', [`<div class="toast toast--inline" role="status" style="width:400px;max-width:100%"><span>Factura 411 eliminada.</span><button type="button" class="toast__action">Deshacer</button></div>`])}`,
+  dialog: row('Dialog', [`<div style="width:400px;max-width:100%">${DialogAlert.render().outerHTML}</div>`]),
   chart: `<div class="sc__grid sc__grid--2">
-      <section class="card"><div class="card__header"><h4 class="card__title">Comparativa Ingresos · Gastos</h4></div>${slot('line')}</section>
-      <section class="card"><div class="card__header"><h4 class="card__title">Comparativa salario neto</h4></div>${slot('bar')}</section>
-      ${distributionHTML().replace(/<h2 class="card__title"/, '<h4 class="card__title"').replace('</h2>', '</h4>')}
+      ${block('Chart · Line', `<section class="card"><div class="card__header"><h4 class="card__title">Comparativa Ingresos · Gastos</h4></div>${slot('line')}</section>`)}
+      ${block('Chart · Bars', `<section class="card"><div class="card__header"><h4 class="card__title">Comparativa salario neto</h4></div>${slot('bar')}</section>`)}
     </div>`,
 };
 const CANVAS = ['card', 'table', 'chart'];
@@ -178,7 +178,7 @@ export const Overview = {
             <div><b>${FOUNDATIONS.length - 1}</b><span>Foundations</span></div>
             <div><b>${Object.keys(ICONS).length}</b><span>Icons</span></div>
             <div><b>${TOKEN_COUNT}</b><span>Tokens</span></div>
-            <div><b>${COMPONENTS.length}</b><span>Components</span></div>
+            <div><b>${COMPONENT_COUNT}</b><span>Components</span></div>
           </div>
         </header>
 
@@ -194,13 +194,15 @@ export const Overview = {
         ${section('tokens', 'All tokens', 'app-foundations-tokens--tokens', 'Read live from <code>tokens/tokens.css</code>: this list updates by itself when a token changes. Click a group to open it, or filter.', slot('tokens'))}
 
         <h2 class="sc__part">Components</h2>
-        ${COMPONENTS.map(([id, t, d, lead]) => section(id, t, d, lead, C[id], CANVAS.includes(id))).join('')}
+        ${COMPONENTS.map(([id, t, d, parts]) => section(id, t, d, `${parts.length} component${parts.length > 1 ? 's' : ''}: ${parts.join(' · ')}`, C[id], CANVAS.includes(id))).join('')}
       </main>`;
 
     // Live slots
     el.querySelector('[data-slot="layout"]').replaceWith(layoutOverview());
     el.querySelector('[data-slot="tokens"]').replaceWith(tokenList({ open: 4, id: 'sc-tok' }));
     el.querySelector('[data-slot="years"]').replaceWith(Object.assign(YearStrip.render(), { style: 'width:100%' }));
+    el.querySelector('[data-slot="sel-section"]').replaceWith(sectionSelector(1));
+    el.querySelector('[data-slot="sel-period"]').replaceWith(periodSelector(0));
     requestAnimationFrame(() => {
       lineChart(el.querySelector('[data-slot="line"]'), { title: 'Comparativa Ingresos · Gastos', labels: M, series: [
         { name: 'Ingresos', color: 'var(--chart-1)', values: [2976.52, 4166.63, 4166.63, 4731.92, 5357.5, 5357.5, 8203.35, 2580.63, 5843.05, 0, 0] },
