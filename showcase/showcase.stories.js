@@ -31,7 +31,7 @@ const COMPONENTS = [
   ['tab', 'Tab', 'app-components-tab--tab', 'Navigation, period tabs, view toggle, year tab'],
   ['selectors', 'Selectors', 'app-components-selectors--selectors', 'Checkbox & radio, status dot, switch / toggle, chips'],
   ['card', 'Card', 'app-components-card--card', 'The white block: KPI card and container card'],
-  ['input', 'Input', 'app-components-input--input', 'Fields, select, textarea'],
+  ['input', 'Input', 'app-components-input--input', 'Fields, select, description, small amounts (tax forms)'],
   ['table', 'Tables', 'app-components-tables--tables', 'Facturación, Gastos, Últimas facturas, Resumen anual, tax forms'],
   ['feedback', 'Banner, tooltip & toast', 'app-components-banner-tooltip-toast--feedback', 'Messages and pop-ups'],
   ['dialog', 'Dialog', 'app-components-dialog--dialog', 'Welcome, alerts and forms'],
@@ -120,8 +120,12 @@ const C = {
   input: `<div class="sc__grid sc__grid--3">
       <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ ...FIELDS.cliente, value: '' })}${fieldHTML({ ...FIELDS.fecha, value: '31/09/2026', error: FIELDS.fecha.msg })}${fieldHTML({ ...FIELDS.iva, value: '0 %', disabled: true, hint: 'La cuota de autónomos no lleva IVA.' })}</div>
       <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ ...FIELDS.proveedor, tinted: true, accent: 'attention' })}${fieldHTML({ ...FIELDS.base, tinted: true, accent: 'attention' })}</div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ ...FIELDS.notas, accent: 'attention' })}</div>
-    </div>`,
+      <div style="display:flex;flex-direction:column;gap:var(--space-16)">${fieldHTML({ label: FIELDS.notas.label, type: 'textarea', placeholder: FIELDS.notas.placeholder, filled: true, optional: true, accent: 'attention' })}</div>
+    </div>
+    ${row('Small · tax forms', [`<div class="field--attention" style="width:720px;max-width:100%"><div class="list">
+      <div class="row row--kv"><label class="row__label" for="sc-sm1">Importe ingresado en Hacienda</label><input class="input input--sm input--num input--w-sm" id="sc-sm1" value="" placeholder="0,00" inputmode="decimal" aria-required="true"></div>
+      <div class="row row--kv"><label class="check"><input type="checkbox" checked> Aplicar compensación</label><input class="input input--sm input--num input--w-sm" value="151,80" placeholder="0,00" inputmode="decimal" aria-label="Importe: Aplicar compensación"></div>
+    </div></div>`])}`,
   feedback: `<div class="sc__grid sc__grid--2">
       <div style="display:flex;flex-direction:column;gap:var(--space-12)">
         ${bannerHTML({ type: 'warning', text: 'Sin facturación española → IVA soportado no deducible este trimestre.' })}
@@ -151,6 +155,11 @@ export default {
 export const Overview = {
   name: 'Foundations, tokens & components',
   render: () => {
+    // Opened in its own browser tab: its own favicon (white square + DS) so it's easy to tell from Storybook (green)
+    if (window.top === window) {
+      const link = document.querySelector('link[rel="icon"]') || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'icon' }));
+      Object.assign(link, { type: 'image/svg+xml', href: './favicon-showcase.svg' });
+    }
     const el = document.createElement('div');
     el.className = 'sc';
     el.innerHTML = `
