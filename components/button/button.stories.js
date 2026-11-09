@@ -7,6 +7,13 @@ import { icon } from '../../icons/icons.js';
 export const BIG_ICONS = ['arrow-right', 'save', 'check', 'download', 'trash', 'plus', 'chevron-down'];
 export const GHOST_ICONS = ['plus', 'arrow-right', 'save', 'check', 'download', 'trash', 'chevron-down'];
 export const ICON_BUTTON_ICONS = { info: ['info'], danger: ['trash', 'close', 'close-filled'] };
+/** Icon button types: each one has its own icon and meaning (the same as the Figma property Type) */
+export const ICON_BUTTON_TYPES = {
+  info: { kind: 'info', icon: 'info', label: 'Más información' },        // opens a tooltip
+  close: { kind: 'danger', icon: 'close', label: 'Cerrar' },             // closes a banner or a dialog
+  remove: { kind: 'danger', icon: 'close-filled', label: 'Eliminar factura 411' },   // removes a line, a message, the text of a field…
+  delete: { kind: 'danger', icon: 'trash', label: 'Eliminar gasto' },    // deletes a record
+};
 const STATES = ['default', 'hover', 'pressed', 'disabled', 'focus'];
 const stateAttrs = (state) => ({
   cls: { hover: ' is-hover', pressed: ' is-active', focus: ' is-focus' }[state] || '',
@@ -26,11 +33,13 @@ export const ghostHTML = ({ colour = 'primary', label = 'Añadir factura', showI
   return `<button type="button" class="btn btn--ghost btn--${colour}${flush ? ' btn--flush' : ''}${cls}"${dis}>${showIcon ? icon(name) : ''}<span class="btn__label">${label}</span></button>`;
 };
 
-/** Icon button · Info (blue) or Danger (grey → red). The label is for screen readers only. */
+/** Icon button · Info (blue) · Close · Remove · Delete (grey → red). The label is for screen readers only.
+    type: 'info' | 'close' | 'remove' | 'delete' (or the older kind + icon). */
 /* Default accessible name for each icon (in the app it is more specific: "Eliminar factura 411") */
 const ICON_LABELS = { info: 'Más información', trash: 'Eliminar', close: 'Cerrar', 'close-filled': 'Eliminar' };
-export const iconButtonHTML = ({ kind = 'info', icon: name, size = 'sm', label, state = 'default' } = {}) => {
+export const iconButtonHTML = ({ type, kind = 'info', icon: name, size = 'sm', label, state = 'default' } = {}) => {
   const { cls, dis } = stateAttrs(state);
+  if (type) ({ kind, icon: name } = ICON_BUTTON_TYPES[type]);
   const ico = name || ICON_BUTTON_ICONS[kind][0];
   label = label || ICON_LABELS[ico] || ico;
   return `<button type="button" class="btn btn--icon btn--${size} btn--${kind}${cls}" aria-label="${label}"${dis}>${icon(ico, { size: size === 'md' ? 'md' : 'sm' })}</button>`;
@@ -41,7 +50,7 @@ const STATE_CONTROL = { control: 'select', options: STATES, description: 'Shown 
 export default {
   title: 'App/Components/Button',
   tags: ['!autodocs'],   // documented in Button.mdx
-  excludeStories: ['bigHTML', 'ghostHTML', 'iconButtonHTML', 'fabHTML', 'BIG_ICONS', 'GHOST_ICONS', 'ICON_BUTTON_ICONS', 'FAB_ICONS'],
+  excludeStories: ['bigHTML', 'ghostHTML', 'iconButtonHTML', 'fabHTML', 'BIG_ICONS', 'GHOST_ICONS', 'ICON_BUTTON_ICONS', 'ICON_BUTTON_TYPES', 'FAB_ICONS'],
   parameters: { layout: 'centered' },
 };
 
@@ -77,15 +86,14 @@ export const Ghost = {
 
 export const Icon = {
   name: 'Icon button',
-  render: (args) => iconButtonHTML(args),
+  render: ({ type, label, ...a }) => iconButtonHTML({ ...a, type, label: label || ICON_BUTTON_TYPES[type].label }),
   argTypes: {
-    kind: { name: 'Style', control: 'inline-radio', options: ['info', 'danger'], description: 'Info: blue · Danger: grey → red', table: { category: 'Variant' } },
-    icon: { name: 'Icon choice', control: 'select', options: [...ICON_BUTTON_ICONS.info, ...ICON_BUTTON_ICONS.danger], table: { category: 'Icon swap' } },
+    type: { name: 'Type', control: { type: 'inline-radio', labels: { info: 'Info (i)', close: 'Close (×)', remove: 'Remove (⊗)', delete: 'Delete (trash)' } }, options: ['info', 'close', 'remove', 'delete'], description: 'Info: blue, opens a tooltip · Close: closes a banner or dialog · Remove: takes out a line, a message, the text of a field · Delete: deletes a record. Close, Remove and Delete: grey → red', table: { category: 'Variant' } },
     size: { name: 'Size', control: 'inline-radio', options: ['sm', 'md'], description: 'sm 24 (dense rows) · md 40', table: { category: 'Variant' } },
     label: { name: 'Label (screen readers only)', control: 'text', description: 'Invisible. Read aloud by screen readers (aria-label): say what the button does, e.g. "Eliminar factura 411". Empty = default for the icon', table: { category: 'Text' } },
     state: { name: 'State', ...STATE_CONTROL, table: { category: 'Variant' } },
   },
-  args: { kind: 'info', icon: 'info', size: 'sm', label: 'Más información', state: 'default' },
+  args: { type: 'info', size: 'sm', label: '', state: 'default' },
 };
 
 /* ── Docs-only stories (hidden from the sidebar) ── */
@@ -103,8 +111,10 @@ export const States = {
     ${statesRow('Big · attention', (s) => bigHTML({ colour: 'attention', label: 'Guardar', icon: 'save', state: s }))}
     ${statesRow('Ghost · primary', (s) => ghostHTML({ state: s }))}
     ${statesRow('Ghost · attention', (s) => ghostHTML({ colour: 'attention', label: 'Añadir gasto', state: s }))}
-    ${statesRow('Icon · info', (s) => iconButtonHTML({ state: s }))}
-    ${statesRow('Icon · danger', (s) => iconButtonHTML({ kind: 'danger', label: 'Eliminar', state: s }))}
+    ${statesRow('Icon · info', (s) => iconButtonHTML({ type: 'info', state: s }))}
+    ${statesRow('Icon · close', (s) => iconButtonHTML({ type: 'close', state: s }))}
+    ${statesRow('Icon · remove', (s) => iconButtonHTML({ type: 'remove', state: s }))}
+    ${statesRow('Icon · delete', (s) => iconButtonHTML({ type: 'delete', state: s }))}
   </div>`,
 };
 

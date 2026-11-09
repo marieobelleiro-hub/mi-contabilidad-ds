@@ -29,7 +29,14 @@ Actions next to content: add, view all, cancel. Always with text.
 
 ## Icon button
 
-Compact actions where the icon is understood on its own: information, delete, close.
+Compact actions where the icon is understood on its own. Four types, each with its own icon and meaning (the same as the Figma property **Type**):
+
+| Type | Icon | Meaning | In the app |
+|---|---|---|---|
+| **Info** | `info` (blue) | opens a tooltip with more information | ⓘ next to card titles |
+| **Close** | `close` × (grey → red) | closes a banner or a dialog | Cerrar aviso · Cerrar |
+| **Remove** | `close-filled` ⊗ (grey → red) | takes something out: a line, a message, the text of a field (a search field, in the future) | the rows of the desktop tables ("Eliminar factura 411") |
+| **Delete** | `trash` (grey → red) | deletes a record | the mobile record lists ("Eliminar gasto") |
 
 <Canvas of={ButtonStories.Icon} />
 <Controls of={ButtonStories.Icon} />
@@ -59,8 +66,7 @@ The same properties will be used in the Figma library.
 | | Icon choice | Icon swap | `plus` · `arrow-right` · `save` · `check` · `download` · `trash` · `chevron-down` | `plus` |
 | | Label | Text | always present, one line | "Añadir factura" |
 | | State | Variant | Default · Hover · Pressed · Disabled · Focus | Default |
-| **Icon** | Style | Variant | Info (blue) · Danger (grey → red) | Info |
-| | Icon choice | Icon swap | Info: `info` · Danger: `trash` · `close` · `close-filled` | `info` |
+| **Icon** | Type | Variant | Info (blue) · Close · Remove · Delete (grey → red), each with its own icon | Info |
 | | Size | Variant | sm 24 · md 40 | sm |
 | | Label | Text · invisible | read by screen readers only (`aria-label`) | "Más información" |
 | | State | Variant | Default · Hover · Pressed · Disabled · Focus | Default |
