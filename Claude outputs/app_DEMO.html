@@ -2159,141 +2159,103 @@ window.MCChart = { lineChart, barChart, formatEuro };
 </script>
 <!-- 4 · APP STYLES: layout and app-only pieces. The components come from the DS above. -->
 <style>
+/* App styles. The components (card, table, dialog, tab, field…) come from the design system (block 2):
+   here only the page layout and the app-only pieces, in the order of the page. Mobile overrides are all in "Mobile". */
+
+/* ══ Base: reset, type, helpers, focus ring ══ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 select{border-radius:0 !important;-webkit-border-radius:0 !important}
 h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-height:inherit}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 body{font-family:'IBM Plex Sans',-apple-system,sans-serif;background:var(--surface);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
-/* Tokens: see the design system block above (#ds-css). */
-/* ── Section show/hide ── */
+/* shown / hidden by the script with the hidden attribute: it always wins over a component's display */
+[hidden]{display:none !important}
+/* number inputs without spinners */
+input[type="number"]{-moz-appearance:textfield;appearance:textfield}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+/* keyboard focus: yellow ring, keyboard only (never on click or programmatic focus) */
+*:focus:not(:focus-visible){outline:none !important}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;box-shadow:0 0 0 1px var(--black)}
+
+/* ══ Page layout: sidebar · header · year strip · main ══ */
 .section{display:none}
 .section.active{display:block}
-/* ── Page shell ── */
+/* page = sidebar + right column (header + main) */
 .page{display:flex;height:100%}
-/* ── Sidebar ── */
 .sidebar{width:var(--sidebar-w);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line);z-index:200}
 .sidebar-brand{padding:var(--space-24) 0 0 0;flex-shrink:0;display:flex;justify-content:flex-end}
 .sidebar-nav{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-20);padding-top:76px}
-/* ── Right column ── */
 .page-right{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;height:100%;overflow-y:auto;overflow-x:hidden}
-/* ── Sticky header ── */
 .sticky-header{position:sticky;top:0;z-index:100;background:var(--surface)}
 .topbar{height:var(--topbar-h);background:var(--surface);display:flex;align-items:center;padding:0 var(--space-24)}
 .user-info{display:flex;align-items:center;gap:var(--space-20);flex-shrink:0}
 .user-name,.user-vat{font-family:var(--font-mono);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:0.088em;color:var(--text)}
-.topbar-actions{flex:1;display:flex;align-items:center;justify-content:center;gap:var(--space-4)}
-.ghost-btn{font-family:var(--font-mono);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:0.088em;color:var(--primary);background:none;border:none;cursor:pointer;padding:var(--space-2) var(--space-8);white-space:nowrap;transition:background 0.1s,color 0.1s}
-.ghost-btn:hover{background:var(--primary);color:var(--white)}
-.topbar-cta{display:flex;align-items:center;gap:var(--space-8);margin-left:var(--space-16);flex-shrink:0}
-/* ── Year strip ── */
+/* "DEMO" + ⓘ next to the user name */
+.user-demo{display:inline-flex;align-items:center;gap:var(--space-4)}
 .year-strip-wrap{display:flex;justify-content:center}
 .year-strip{display:flex;width:1108px;gap:var(--space-16)}
-/* ── Main content ── */
 .main-content{flex:1;display:flex;flex-direction:column}
 .content-body{background:var(--canvas);flex:1;padding:0 0 256px 0}
-/* ── Dash wrap (1108px centred) ── */
+/* content column: 1108px centred */
 .dash-wrap{width:1108px;margin:0 auto;display:flex;flex-direction:column;gap:0;padding-top:var(--space-32)}
 .dash-wrap-home{padding-top:0}
-/* ── Date header ── */
 .date-header{font-family:var(--font-sans);font-size:24px;font-weight:300;color:var(--text);padding:var(--space-24) 0 var(--space-16) 0}
-/* ── Summary cards ── */
+
+/* ══ Shared section pieces: toolbar · KPI grids · view panels ══ */
+/* section toolbar: period tabs (or view toggle) on the left, ⓘ on the right */
+.section-toolbar{display:flex;align-items:center;justify-content:space-between}
+.section-toolbar--views{margin-top:var(--space-32)}
+.section-toolbar--views .view-toggle{margin-top:0;align-self:center}
+/* KPI cards (Card · KPI) in a row of 4: section summary, IRPF quarters */
 .summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-16);margin-top:var(--space-32)}
-/* section KPI cards: design-system .card--kpi */
-/* ── Dashboard mid row ── */
-.mid-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-16)}
-.panel{background:var(--surface);border-radius:var(--radius-md);padding:var(--space-16) var(--space-20) 0;display:flex;flex-direction:column}
-.quarter-panel{background:var(--surface);border-radius:var(--radius-md);padding:var(--space-16) var(--space-20) 0;margin-top:var(--space-16)}
-.panel-title{font-family:var(--font-mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.088em;color:var(--text);margin-bottom:var(--space-12)}
-/* ── Dashboard list rows ── */
-.factura-row{display:flex;align-items:center;padding:var(--space-12) 0;border-bottom:1px solid var(--line);gap:var(--space-16)}
-.factura-row:last-child{border-bottom:none}
-.fact-name{flex:1;font-family:var(--font-sans);font-size:12px;font-weight:400;color:var(--text)}
-.fact-name strong{font-weight:700}
-.fact-date{font-family:var(--font-sans);font-size:12px;color:var(--text-muted);min-width:90px;text-align:center}
-.fact-status{display:inline-flex;align-items:center;gap:var(--space-8);margin-left:var(--space-24)}
-.fact-amount{font-family:var(--font-sans);font-size:12px;font-weight:700;color:var(--text)}
-.gasto-row{display:flex;align-items:center;padding:var(--space-8) 0;border-bottom:1px solid var(--line)}
-.gasto-row:last-child{border-bottom:none}
-.gasto-name{flex:1;font-family:var(--font-sans);font-size:12px;font-weight:400;color:var(--text)}
-.gasto-amount{font-family:var(--font-sans);font-size:12px;font-weight:700;color:var(--text);text-align:right}
-/* ── Quarter table (dashboard IRPF/IVA) ── */
-.col-label{width:220px}
-.panel-footer{display:flex;justify-content:space-between;align-items:center;padding:var(--space-12) 0 var(--space-16) 0}
-.footer-label,.footer-amount{font-family:var(--font-mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.088em;color:var(--primary)}
-/* ── Dots ── */
-/* ── Quarter tabs ── */
-/* ── Ingresos ── */
+.qtr-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-16);margin-top:var(--space-32)}
+/* Gastos views (Por cat. IRPF / Por % IVA): a column of cards */
+.view-content{display:flex;flex-direction:column;gap:var(--space-16);margin-top:var(--space-32)}
+#gastos-cats-container,#gastos-iva-container{display:flex;flex-direction:column;gap:var(--space-16)}
+
+/* ══ Dashboard ══ */
+/* top row: salario + ahorro (left) | IVA + IRPF a pagar (right) · then two rows of 2 cards */
+.db-top-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-24)}
+.db-top-left{display:flex;flex-direction:column;gap:var(--space-16)}
+.db-top-right>.card{flex:1;justify-content:center}
+.db-top-right{display:flex;flex-direction:column;gap:var(--space-16)}
+.db-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-16)}
+
+/* ══ Facturación ══ */
 .ing-card{margin-top:var(--space-16)}
 .ing-card__footer{border-top:var(--border-thin) solid var(--line);padding-top:var(--space-12)}
 .ing-summary{display:flex;justify-content:space-between;align-items:center;gap:var(--space-16);padding:var(--space-16) 0}
 .ing-legend{display:flex;gap:var(--space-24);align-items:center;margin-left:auto}
-/* ── Gastos ── */
-.view-content{display:flex;flex-direction:column;gap:var(--space-16);margin-top:var(--space-32)}
-/* Section toolbar: period tabs (or view toggle) on the left, ⓘ on the right */
-.section-toolbar{display:flex;align-items:center;justify-content:space-between}
-.section-toolbar--views{margin-top:var(--space-32)}
-.section-toolbar--views .view-toggle{margin-top:0;align-self:center}
-/* "DEMO" + ⓘ next to the user name */
-.user-demo{display:inline-flex;align-items:center;gap:var(--space-4)}
-#gastos-cats-container,#gastos-iva-container{display:flex;flex-direction:column;gap:var(--space-16)}
-/* ── Global hover tooltip ── */
-.g-tooltip{position:fixed;z-index:9999;width:480px;max-width:calc(100vw - 24px);padding:var(--space-8) var(--space-16);display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-8);border-left:3px solid var(--primary);background:var(--primary-tint);box-shadow:var(--shadow-md);color:var(--primary);font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:14px;font-weight:400;line-height:1.55;pointer-events:none;opacity:0;visibility:hidden;transition:opacity 0.12s;top:-9999px;left:-9999px}
-.g-tooltip.visible{opacity:1;visibility:visible;pointer-events:auto}
-.g-tooltip a{color:inherit;text-decoration:underline}
-.g-tooltip p{margin:0}
+/* delete button in a table row: never clipped by the narrow cell */
+td:has(> .del-btn){overflow:visible;text-overflow:clip;padding-right:0}
 
+/* ══ Gastos ══ */
 .gst-card__footer{border-top:var(--border-thin) solid var(--line);padding-top:var(--space-12)}
 .add-bloque-wrap{background:var(--surface);border-radius:var(--radius-md);padding:var(--space-16) var(--space-20);text-align:center}
-/* ── IVA / IRPF: tax forms and annual summaries (design system: card--sectioned, list, result, table--summary) ── */
+
+/* ══ IVA · IRPF: tax forms and annual summaries ══ */
 .tax-form{margin-top:var(--space-32)}
 .tax-form__banner{padding:var(--space-8) 0 var(--space-16)}
 .anual-card{margin-top:var(--space-32)}
 .anual-card + .anual-card{margin-top:var(--space-16)}
 .anual-card__footer{margin-top:var(--space-16)}
 .anual-card .card__section-title{margin-top:0}
-/* Code chips */
-/* ── Dashboard v2 ── */
-/* Top row: left (salario+facturas) | right (tax cards) */
-.db-top-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-24)}
-.db-top-left{display:flex;flex-direction:column;gap:var(--space-16)}
-.db-top-right>.card{flex:1;justify-content:center}
-.db-top-right{display:flex;flex-direction:column;gap:var(--space-16)}
-/* Tax cards */
-.db-tax-card{cursor:pointer;flex:1;display:flex;flex-direction:column;justify-content:center}
-/* Charts grid */
-.db-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-16)}
-/* Distribución del gasto bars */
-/* ── Annual panels (IVA+IRPF) ── */
-/* ── IRPF form ── */
-.qtr-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-16);margin-top:var(--space-32)}
-/* IRPF period cards: design-system .card--kpi (.is-selected / .is-disabled) */
-/* Inline inputs in tables */
-input[type="text"].tbl-inp,input:not([type]).tbl-inp,input[type="number"].tbl-inp{border:none;background:transparent;width:100%;font-family:inherit;font-size:inherit;color:inherit}
-input[type="text"].tbl-inp:focus,input:not([type]).tbl-inp:focus,input[type="number"].tbl-inp:focus{outline:1px solid var(--disabled)}
-/* Tab focus visibility inside editable table rows — overrides inline outline:none */
-input[type="number"]{-moz-appearance:textfield;appearance:textfield}
-input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:inherit;cursor:pointer}
 
-/* Shown / hidden by the script with the hidden attribute: it always wins over a component's display */
-[hidden]{display:none !important}
+/* ══ Tooltip of the ⓘ buttons (one for the page) ══ */
+.g-tooltip{position:fixed;z-index:9999;width:480px;max-width:calc(100vw - 24px);padding:var(--space-8) var(--space-16);display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-8);border-left:3px solid var(--primary);background:var(--primary-tint);box-shadow:var(--shadow-md);color:var(--primary);font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:14px;font-weight:400;line-height:1.55;pointer-events:none;opacity:0;visibility:hidden;transition:opacity 0.12s;top:-9999px;left:-9999px}
+.g-tooltip.visible{opacity:1;visibility:visible;pointer-events:auto}
+.g-tooltip a{color:inherit;text-decoration:underline}
+.g-tooltip p{margin:0}
 
-/* ── App backdrop: the dim layer behind the welcome dialog and the Atención alert (DS Dialog inside).
-   Not a native <dialog>: the alert has to open over the mobile full-screen dialogs. ── */
+/* ══ App backdrop: behind the welcome dialog and the Atención alert ══ */
+/* not a native <dialog>: the alert has to open over the mobile full-screen dialogs */
 .app-backdrop{position:fixed;inset:0;z-index:var(--layer-dialog);background:var(--overlay);display:flex;align-items:center;justify-content:center;padding:var(--space-24);overflow-y:auto}
-.app-backdrop[hidden]{display:none}
 @media (max-width:1023px){
   .app-backdrop{padding:0}                     /* the Regular dialog fills the screen; the Small one stays centred */
 }
-/* ring hidden when the modal opens; it appears once the user presses Tab inside it */
-/* ── Keyboard focus: yellow ring, keyboard-only (never on click or programmatic focus) ── */
-*:focus:not(:focus-visible){outline:none !important}
-/* Global rule — covers all native buttons, inputs, links, and custom elements */
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px;box-shadow:0 0 0 1px var(--black)}
-/* Inset offset for flat-surface tabs and nav items */
-/* Outward ring for tiny dot status toggles */
-/* ═══ ACCESO FÁCIL — accessible assistant window ═══ */
+
+/* ══ Acceso fácil: accessible assistant window ══ */
 :root{--af-grey:#525252;--af-dim:#A8A8A8;--af-err:#FFB38A}
 .af-launch{position:fixed;bottom:24px;left:42px;z-index:201;width:40px;height:40px;border:none;background:none;padding:0;cursor:pointer;border-radius:50%}
 .af-launch svg{display:block;width:40px;height:40px}
@@ -2303,7 +2265,6 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .af-launch[aria-expanded="true"]{box-shadow:0 0 0 2px var(--white),0 0 0 5px var(--attention)}
 .af-launch[aria-expanded="true"]:focus-visible{outline-offset:8px}
 .af-panel{position:fixed;z-index:900;display:flex;flex-direction:column;background:var(--af-grey);color:var(--white);box-shadow:0 8px 32px rgba(0,0,0,0.35);border:1px solid #000;min-width:320px;min-height:200px}
-.af-panel[hidden]{display:none}
 .af-panel.is-full{inset:0 !important;width:auto !important;height:auto !important;z-index:950;border:none}
 .af-head{flex-shrink:0;height:48px;display:flex;align-items:center;gap:12px;padding:0 12px 0 14px;background:var(--primary);color:var(--white);cursor:move;user-select:none;touch-action:none}
 .af-panel.is-full .af-head{cursor:default}
@@ -2359,7 +2320,6 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .af-field label,.af-fs legend{font-family:var(--font-sans);font-size:16px}
 .af-field input,.af-field select{font-family:var(--font-mono);font-size:14px;height:40px;padding:0 10px;border:2px solid var(--white);border-radius:0;background:var(--surface);color:#000;max-width:360px;width:100%}
 .af-field input[aria-invalid="true"]{border-color:var(--af-err)}
-.af-hint{font-size:16px;color:#E0E0E0}
 .af-err{color:var(--af-err);font-size:16px}
 .af-err:empty{display:none}
 .af-fs{border:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
@@ -2390,14 +2350,15 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
   .af-opt{font-size:12px;padding:5px 12px;min-height:36px;display:inline-flex;align-items:center}
   .af-field label,.af-fs legend{font-size:16px}
   .af-field input,.af-field select{font-size:16px;height:44px}
-  .af-hint,.af-err{font-size:15px}
+  .af-err{font-size:15px}
   .af-answer p,.af-answer li{font-size:15px}
   .af-answer h4{font-size:16px}
   .af-foot{margin-top:20px;padding-top:14px}
   .af-icon-btn{width:44px;height:44px}
 }
 @media (prefers-reduced-motion:reduce){.af-lang .af-lt-thumb{transition:none}}
-/* ═══ ASISTENTE INTELIGENTE — conversational assistant ═══ */
+
+/* ══ Asistente Inteligente: conversational assistant ══ */
 .ai-launch{position:fixed;bottom:84px;left:42px;z-index:201;width:40px;height:40px;border:none;background:none;padding:0;cursor:pointer;border-radius:50%}
 .ai-launch svg{display:block;width:40px;height:40px}
 .ai-launch:hover svg .ai-bg{fill:#E5EDFF}
@@ -2405,7 +2366,6 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .ai-launch[aria-expanded="true"]{box-shadow:0 0 0 2px var(--white),0 0 0 5px var(--attention)}
 .ai-launch[aria-expanded="true"]:focus-visible{outline-offset:8px}
 .ai-panel{position:fixed;z-index:900;left:148px;right:56px;bottom:44px;display:flex;flex-direction:column;max-height:calc(100vh - 88px);background:#F2F5FD;box-shadow:0 8px 32px rgba(0,0,0,0.25);border:1px solid rgba(0,0,0,0.12)}
-.ai-panel[hidden]{display:none}
 .ai-panel.is-full{inset:0 !important;max-height:none;z-index:950;border:none}
 .ai-head{flex-shrink:0;height:56px;display:flex;align-items:center;gap:12px;padding:0 12px 0 18px;background:var(--primary);color:var(--white);cursor:move;user-select:none;touch-action:none}
 .ai-panel.is-full .ai-head{cursor:default}
@@ -2449,8 +2409,6 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .ai-clear{font-family:var(--font-mono);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:0.088em;color:var(--primary);background:none;border:none;cursor:pointer;padding:2px 10px;margin-left:auto}
 .ai-clear:hover{background:var(--primary);color:var(--white)}
 .ai-clear:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-.ai-clear[hidden]{display:none}
-
 @media (max-width:1023px){
   .ai-launch{left:20px;bottom:76px}
   .ai-head{gap:6px;padding:0 6px 0 12px}
@@ -2466,110 +2424,9 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .ai-panel.is-full .ai-resize{display:none}
 .ai-title h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:1023px){.ai-resize{display:none}}
-/* ═══ MOBILE LAYOUT (≤1023px; centred column of max 768px) ═══ */
-.m-brand,.m-nav{display:none}
-.launch-dock{display:contents}
-@media (max-width:1023px){
-  .sidebar{display:none}
-  .page-right{margin-left:0}
-  .sticky-header{position:static}
-  /* header: brand | user · section selector */
-  .topbar{height:auto;display:grid;grid-template-columns:auto 1fr;column-gap:var(--space-24);row-gap:var(--space-24);align-items:center;padding:var(--space-24) var(--space-16) 0}
-  .m-brand{display:inline-flex;justify-self:start}
-  .user-info{justify-content:flex-end;flex-wrap:wrap;gap:var(--space-4) var(--space-8);min-width:0;text-align:right}
-  .user-name{white-space:nowrap}
-  .m-nav{display:inline-flex;grid-column:1 / -1;justify-self:start}
-  /* years: only the ones that exist, two per row */
-  .year-strip-wrap{padding:var(--space-8) var(--space-16) 0}
-  .year-strip{width:100%;gap:var(--space-24)}
-  .year-tab:disabled{display:none}
-  /* content */
-  .content-body{padding:0 0 140px}
-  .dash-wrap{width:auto;padding:var(--space-24) var(--space-16) 0}
-  .dash-wrap-home{padding-top:0;gap:var(--space-16)}
-  .date-header{padding:var(--space-24) 0 var(--space-8)}
-  /* dashboard: one column — chart, últimas facturas, then the summary boxes */
-  .dash-wrap-home .db-top-row,.dash-wrap-home .db-top-left,.dash-wrap-home .db-top-right,.dash-wrap-home .db-charts-grid{display:contents}
-  .db-p-area{order:1}.db-p-fact{order:2}.db-p-sal{order:3}.db-p-ahorro{order:4;margin-top:0 !important}.db-p-iva{order:5}.db-p-irpf{order:6}
-  .db-p-bar,.db-p-distrib{display:none !important}
-  .date-header{order:0}
-  .fact-date{display:none}
-  .fact-name,.fact-amount{font-size:14px}
-  .factura-row{gap:var(--space-12)}
-  .fact-status{margin-left:var(--space-12);gap:var(--space-16)}
-  /* other sections (interim): tabs scroll sideways, wide tables scroll inside their panel */
-  .qtr-tabs,.view-toggle{max-width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
-  .qtr-tabs::-webkit-scrollbar,.view-toggle::-webkit-scrollbar{display:none}
-  .qtr-tab,.view-tab{width:auto}
-  .summary-cards,.qtr-cards{grid-template-columns:1fr;gap:var(--space-12);margin-top:var(--space-24)}
-  .quarter-panel{overflow-x:auto}
-  .col-label{width:190px}
-  /* launchers: bottom-right dock */
-  .launch-dock{position:fixed;right:16px;bottom:24px;z-index:201;display:inline-flex;padding:12px;flex-direction:column;align-items:flex-start;gap:27px;border-radius:12px;border:1px solid #E9E9E9;background:rgba(255,255,255,0.50)}
-  .launch-dock .ai-launch,.launch-dock .af-launch{position:static;box-shadow:0 2px 4px rgba(0,0,0,0.25)}
-  .launch-dock .ai-launch[aria-expanded="true"],.launch-dock .af-launch[aria-expanded="true"]{box-shadow:0 0 0 2px var(--white),0 0 0 5px var(--attention),0 2px 6px rgba(0,0,0,0.25)}
-}
-
-/* ═══ MOBILE FACTURACIÓN (≤1023px only) ═══ */
-.m-only,.m-dialog{display:none}
-@media (max-width:1023px){
-  #s-ingresos>.dash-wrap{display:none}
-  .m-only{display:block}
-  .m-fact{padding:var(--space-24) var(--space-16) 0}
-  .m-period{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-12);margin-bottom:var(--space-12)}
-  .m-dd{position:relative}
-  .m-period .m-all{align-self:flex-end;margin:0 calc(-1 * var(--space-8)) 0 0}
-  .m-salcli{margin-top:var(--space-16)}
-  .m-cards{display:flex;flex-direction:column;gap:var(--space-16)}
-  .m-card{background:var(--surface);border-radius:var(--radius-md);padding:var(--space-20)}
-  .m-card-title{font-family:var(--font-sans);font-size:16px;font-weight:400;color:var(--text);margin-bottom:var(--space-8)}
-  .m-link{font-family:var(--font-mono);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:0.088em;color:var(--primary);background:none;border:none;cursor:pointer;padding:var(--space-8) var(--space-8);min-height:36px;transition:background 0.1s,color 0.1s}
-  .m-link:hover{background:var(--primary);color:var(--white)}
-  .card--kpi .m-add,.card--kpi .m-gadd{margin:var(--space-16) 0 calc(-1 * var(--space-8)) calc(-1 * var(--space-8))}
-  /* full-screen dialogs */
-  .m-dialog{position:fixed;inset:0;z-index:980;background:var(--surface);overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .m-dialog:not([hidden]){display:block}
-  #m-inv{z-index:985}
-  .m-dlg-form{display:contents}
-  .m-dialog [hidden]{display:none}   /* parts switched off by the form (Nueva factura exenta, Objeto) */   /* the form's parts are the dialog's parts (header · body · actions) */
-  /* list of invoices */
-  .m-lcard .table-totals{padding-top:var(--space-16)}
-  .m-glist-cards{display:contents}                 /* its cards are the dialog body's items (16px apart) */
-  .m-lcard-add{display:flex;justify-content:flex-end;padding:var(--space-8) 0}
-  .m-lcard-add .m-link{margin-right:calc(-1 * var(--space-8))}
-  .m-legend{display:flex;align-items:center;gap:var(--space-24);padding:0 var(--space-4);font-family:var(--font-sans);font-size:14px;color:var(--text-muted)}
-  .m-legend span{display:inline-flex;align-items:center;gap:var(--space-8)}
-  .m-legend .gst-info-btn{margin-left:auto}
-  #m-toast{right:104px;width:auto;min-width:0;max-width:none}   /* mobile: full width, clear of the assistant buttons (bottom right) */
-}
-
-/* ═══ MOBILE GASTOS (≤1023px only) ═══ */
-@media (max-width:1023px){
-  #s-gastos>.dash-wrap{display:none}
-  #m-gnew{z-index:985}
-  .m-orange .m-gadd-all{display:flex;justify-content:flex-end}
-  .m-num{min-width:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
-  .m-legend .m-legend-info{display:none}
-}
-
-/* ═══ MOBILE IVA / IRPF (≤1023px only) ═══ */
-@media (max-width:1023px){
-  .desk-tabrow{display:none !important}
-  .m-period-row{flex-direction:row;align-items:center;justify-content:space-between;margin-bottom:0}
-  .anual-card .table-wrap{display:none}
-  .tax-form,.anual-card{margin-top:var(--space-24)}
-  .m-qblocks{display:flex;flex-direction:column}
-  .m-qblocks .card__section{padding-inline:0}     /* the annual card already has its padding */
-  .m-qblocks .card__section:first-child .card__section-title{padding-top:0}
-  .m-qblocks .card__section:last-child{border-bottom:var(--border-thin) solid var(--line)}   /* hairline above the annual result */
-  .qtr-cards{margin-top:var(--space-24)}
-  .qtr-cards .m-hide{display:none}
-}
-
-/* Inline forms inside the Asistente Inteligente (new invoice / new expense) */
+/* inline forms in the chat (new invoice / new expense) */
 .ai-msg.has-form{width:min(560px,100%);max-width:100%}
 .ai-cform{display:flex;flex-direction:column;gap:16px;margin-top:4px}
-.ai-cf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .ai-cf-title{font-size:20px !important;font-weight:400 !important;margin:0 !important;line-height:1.3}
 .ai-cf-intro{margin:16px 0 !important}
 .ai-cform .ai-cf-type+.ai-cf-intro{margin-top:24px !important}
@@ -2577,7 +2434,6 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .ai-cf-cancel{flex-shrink:0;font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:0.088em;background:none;border:none;cursor:pointer;padding:6px 10px;margin:0 0 0 -10px;color:var(--primary)}
 .ai-cf-cancel:hover{background:var(--primary);color:var(--white)}
 .ai-cf-field{display:flex;flex-direction:column;gap:6px}
-.ai-cf-field[hidden],.ai-cf-esp[hidden]{display:none}
 .ai-cf-esp{display:flex;flex-direction:column;gap:16px}
 .ai-cf-field label,.ai-cf-type legend{font-family:var(--font-sans);font-size:16px;color:var(--text)}
 .ai-cf-field input,.ai-cf-field select{height:40px;padding:0 12px;border:1px solid #C6C6C6;border-radius:0;background:#F2F5FD;font-family:var(--font-sans);font-size:16px;color:var(--text);width:100%}
@@ -2604,25 +2460,100 @@ select.tbl-sel{border:none;background:transparent;font-family:inherit;font-size:
 .ai-cf-save:hover{filter:brightness(1.12)}
 .ai-cf-save:focus-visible,.ai-cf-cancel:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 
-/* ═══ Centred mobile column (768–1023px) + fluid desktop (1024–1231px) ═══ */
+/* ══ Mobile (≤1023px): one centred column of max 768px ══ */
+/* mobile-only parts are hidden on desktop */
+.m-brand,.m-nav{display:none}
+.launch-dock{display:contents}
+.m-only,.m-dialog{display:none}
+/* ghost buttons on the grey canvas: the -dark step keeps 4.5:1 */
+.m-period .btn--ghost.btn--primary{--btn-accent:var(--primary-dark)}
+.m-period .btn--ghost.btn--attention{--btn-accent:var(--attention-dark)}
 @media (max-width:1023px){
+  /* layout · header · year strip · dashboard · interim tabs · assistant launchers */
+  .sidebar{display:none}
+  .page-right{margin-left:0}
+  .sticky-header{position:static}
+  /* header: brand | user · section selector */
+  .topbar{height:auto;display:grid;grid-template-columns:auto 1fr;column-gap:var(--space-24);row-gap:var(--space-24);align-items:center;padding:var(--space-24) var(--space-16) 0}
+  .m-brand{display:inline-flex;justify-self:start}
+  .user-info{justify-content:flex-end;flex-wrap:wrap;gap:var(--space-4) var(--space-8);min-width:0;text-align:right}
+  .user-name{white-space:nowrap}
+  .m-nav{display:inline-flex;grid-column:1 / -1;justify-self:start}
+  /* years: only the ones that exist, two per row */
+  .year-strip-wrap{padding:var(--space-8) var(--space-16) 0}
+  .year-strip{width:100%;gap:var(--space-24)}
+  .year-tab:disabled{display:none}
+  /* content */
+  .content-body{padding:0 0 140px}
+  .dash-wrap{width:auto;padding:var(--space-24) var(--space-16) 0}
+  .dash-wrap-home{padding-top:0;gap:var(--space-16)}
+  .date-header{padding:var(--space-24) 0 var(--space-8)}
+  /* dashboard: one column — chart, últimas facturas, then the summary boxes */
+  .dash-wrap-home .db-top-row,.dash-wrap-home .db-top-left,.dash-wrap-home .db-top-right,.dash-wrap-home .db-charts-grid{display:contents}
+  .db-p-area{order:1}.db-p-fact{order:2}.db-p-sal{order:3}.db-p-ahorro{order:4;margin-top:0 !important}.db-p-iva{order:5}.db-p-irpf{order:6}
+  .db-p-bar,.db-p-distrib{display:none !important}
+  .date-header{order:0}
+  /* other sections (interim): tabs scroll sideways, wide tables scroll inside their panel */
+  .qtr-tabs,.view-toggle{max-width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .qtr-tabs::-webkit-scrollbar,.view-toggle::-webkit-scrollbar{display:none}
+  .qtr-tab,.view-tab{width:auto}
+  .summary-cards,.qtr-cards{grid-template-columns:1fr;gap:var(--space-12);margin-top:var(--space-24)}
+  /* launchers: bottom-right dock */
+  .launch-dock{position:fixed;right:16px;bottom:24px;z-index:201;display:inline-flex;padding:12px;flex-direction:column;align-items:flex-start;gap:27px;border-radius:12px;border:1px solid #E9E9E9;background:rgba(255,255,255,0.50)}
+  .launch-dock .ai-launch,.launch-dock .af-launch{position:static;box-shadow:0 2px 4px rgba(0,0,0,0.25)}
+  .launch-dock .ai-launch[aria-expanded="true"],.launch-dock .af-launch[aria-expanded="true"]{box-shadow:0 0 0 2px var(--white),0 0 0 5px var(--attention),0 2px 6px rgba(0,0,0,0.25)}
+  /* Facturación + the full-screen dialogs (forms, lists) */
+  #s-ingresos>.dash-wrap{display:none}
+  .m-only{display:block}
+  .m-fact{padding:var(--space-24) var(--space-16) 0}
+  .m-period{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-12);margin-bottom:var(--space-12)}
+  .m-dd{position:relative}
+  .m-period .m-all{align-self:flex-end;margin:0 calc(-1 * var(--space-8)) 0 0}
+  .m-salcli{margin-top:var(--space-16)}
+  .m-cards{display:flex;flex-direction:column;gap:var(--space-16)}
+  .card--kpi .m-add,.card--kpi .m-gadd{margin:var(--space-16) 0 calc(-1 * var(--space-8)) calc(-1 * var(--space-8))}
+  /* full-screen dialogs */
+  .m-dialog{position:fixed;inset:0;z-index:980;background:var(--surface);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .m-dialog:not([hidden]){display:block}
+  #m-inv{z-index:985}
+  .m-dlg-form{display:contents}
+  /* list of invoices */
+  .m-lcard .table-totals{padding-top:var(--space-16)}
+  .m-glist-cards{display:contents}                 /* its cards are the dialog body's items (16px apart) */
+  .m-lcard-add{display:flex;justify-content:flex-end;padding:var(--space-8) 0}
+  .m-legend{display:flex;align-items:center;gap:var(--space-24);padding:0 var(--space-4);font-family:var(--font-sans);font-size:14px;color:var(--text-muted)}
+  .m-legend span{display:inline-flex;align-items:center;gap:var(--space-8)}
+  .m-legend .gst-info-btn{margin-left:auto}
+  #m-toast{right:104px;width:auto;min-width:0;max-width:none}   /* mobile: full width, clear of the assistant buttons (bottom right) */
+  /* Gastos */
+  #s-gastos>.dash-wrap{display:none}
+  #m-gnew{z-index:985}
+  .m-orange .m-gadd-all{display:flex;justify-content:flex-end}
+  .m-num{min-width:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+  .m-legend .m-legend-info{display:none}
+  /* IVA · IRPF */
+  .desk-tabrow{display:none !important}
+  .m-period-row{flex-direction:row;align-items:center;justify-content:space-between;margin-bottom:0}
+  .anual-card .table-wrap{display:none}
+  .tax-form,.anual-card{margin-top:var(--space-24)}
+  .m-qblocks{display:flex;flex-direction:column}
+  .m-qblocks .card__section{padding-inline:0}     /* the annual card already has its padding */
+  .m-qblocks .card__section:first-child .card__section-title{padding-top:0}
+  .m-qblocks .card__section:last-child{border-bottom:var(--border-thin) solid var(--line)}   /* hairline above the annual result */
+  .qtr-cards{margin-top:var(--space-24)}
+  .qtr-cards .m-hide{display:none}
+  /* centred column (768–1023px) */
   .topbar,.year-strip-wrap,.main-content .dash-wrap,.m-fact{width:100%;max-width:768px;margin-left:auto;margin-right:auto}
   .m-dialog-list .dialog__header,.m-dialog-list .dialog__body{width:100%;max-width:768px;margin-left:auto;margin-right:auto}
   #m-toast{max-width:var(--toast-max-w)}
 }
+
+/* ══ Narrow desktop (1024–1231px): fluid width ══ */
 @media (min-width:1024px) and (max-width:1231px){
   .dash-wrap{width:auto;max-width:1108px;margin:0 var(--space-24)}
   .year-strip{width:auto;flex:1;max-width:1108px;margin:0 var(--space-24)}
-  .quarter-panel{overflow-x:auto}
   .qtr-tab,.view-tab{width:auto;flex:1}
 }
-
-/* text on the grey backgrounds: slightly darker ink so it keeps 4.5:1 (WCAG AA) */
-/* row delete (24px icon button) must not be clipped by the narrow cell */
-td:has(> .del-btn){overflow:visible;text-overflow:clip;padding-right:0}
-/* ghost buttons on the grey canvas: -dark step keeps 4.5:1 */
-.m-period .btn--ghost.btn--primary{--btn-accent:var(--primary-dark)}
-.m-period .btn--ghost.btn--attention{--btn-accent:var(--attention-dark)}
 </style>
 </head>
 <body>
@@ -4988,7 +4919,7 @@ const TRIM_LABELS = ['1T · Ene–Mar','2T · Abr–Jun','3T · Jul–Sep','4T �
 const TRIM_DEADLINES = ['20 de abril','20 de julio','20 de octubre','30 de enero'];
 
 // ─── Embedded data store ──────────────────────────────────────────────────────
-let __appData = {"_years":[2025,2026],"yr_2025":{"facturas":[{"id":"lny4mn","type":"ext","num":"300","fecha":"31/01/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"zzogqd","type":"ext","num":"301","fecha":"28/02/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4761.92,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"y1ubje","type":"ext","num":"302","fecha":"31/03/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"pkmffu","type":"ext","num":"303","fecha":"30/04/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"y3w43i","type":"ext","num":"304","fecha":"31/05/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4761.92,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"4kjw65","type":"ext","num":"305","fecha":"30/06/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"00gsyo","type":"esp","num":"306","fecha":"03/07/2025","cliente":"Asociación Espacio Geranios","concepto":"Servicios de diseño","base":264.15,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"q8lq0g","type":"ext","num":"307","fecha":"31/07/2025","cliente":"Main client","concepto":"Servicios de diseño","base":3571.35,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"zby235","type":"ext","num":"308","fecha":"31/08/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.62,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"o84vj8","type":"ext","num":"309","fecha":"30/09/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"a4pzss","type":"ext","num":"310","fecha":"31/10/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":4},{"id":"b3b7rs","type":"ext","num":"311","fecha":"30/11/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.62,"iva":0,"ret":false,"cobrada":true,"trim":4},{"id":"9zph1l","type":"ext","num":"312","fecha":"31/12/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":4}],"gastos":[{"id":"29tpmo","cat":"arr","num":"","fecha":"01/01/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"62b2ir","cat":"arr","num":"","fecha":"01/02/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"xqofao","cat":"arr","num":"","fecha":"01/03/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"aslpy9","cat":"serv","num":"309FA67E-2176","fecha":"25/01/2025","proveedor":"Daniel Smith","concepto":"English - 21 days challenge","iva":0,"base":79,"en303":true,"trim":1},{"id":"17rubz","cat":"serv","num":"K10016488099","fecha":"20/01/2025","proveedor":"italki","concepto":"English - Morag","iva":0,"base":101.48,"en303":true,"trim":1},{"id":"nlcs8j","cat":"serv","num":"309FA67E-2267","fecha":"31/03/2025","proveedor":"Daniel Smith","concepto":"English - 21 days challenge","iva":0,"base":79,"en303":true,"trim":1},{"id":"wbpzwn","cat":"serv","num":"K10016702078","fecha":"16/02/2025","proveedor":"italki","concepto":"English - Morag","iva":0,"base":103.56,"en303":true,"trim":1},{"id":"dpqwo2","cat":"sum","num":"S11/0152688765","fecha":"06/04/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":34.42,"en303":false,"trim":1},{"id":"oabqb5","cat":"sum","num":"S11/0151228002","fecha":"06/03/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":37.65,"en303":false,"trim":1},{"id":"ytbxb3","cat":"sum","num":"S11/0149765412","fecha":"06/02/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":37.65,"en303":false,"trim":1},{"id":"oqpfhp","cat":"otros","num":"","fecha":"06/04/2025","proveedor":"jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"y81158","cat":"otros","num":"","fecha":"06/03/2025","proveedor":"Jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"ybhwed","cat":"otros","num":"","fecha":"06/02/2025","proveedor":"Jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"5unpeg","cat":"sum","num":"21250219010440100","fecha":"19/02/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":26.02,"en303":false,"trim":1},{"id":"1urv75","cat":"sum","num":"21250313010299300","fecha":"13/03/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":18.26,"en303":false,"trim":1},{"id":"17g9fq","cat":"sum","num":"21250411010283500","fecha":"11/04/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":20.84,"en303":false,"trim":1},{"id":"fwyrjt","cat":"reta","num":"","fecha":"31/01/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":false,"trim":1},{"id":"nj5ynb","cat":"reta","num":"","fecha":"28/02/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":true,"trim":1},{"id":"x7bdde","cat":"reta","num":"","fecha":"31/03/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":true,"trim":1},{"id":"bsviwz","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"aeropuerto Barajas quiosco","concepto":"Lunch pack","iva":10,"base":8.17,"en303":false,"trim":2},{"id":"6lrkuk","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"Varios / edreams","concepto":"Viaje London - Cambridge","iva":0,"base":184.85,"en303":true,"trim":2},{"id":"tohs1y","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"UK GOV","concepto":"ETA - certificado","iva":0,"base":19.78,"en303":true,"trim":2},{"id":"red0te","cat":"trans","num":"05286760CX576412C","fecha":"08/06/2025","proveedor":"Booking","concepto":"Hotel cambridge","iva":0,"base":95.68,"en303":true,"trim":2},{"id":"7yfaps","cat":"trans","num":"","fecha":"02/06/2025","proveedor":"Viaje coche personal","concepto":"Km de viaje 71,5*2*0,26","iva":0,"base":37.18,"en303":true,"trim":2},{"id":"abk3ob","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"Varios England","concepto":"","iva":0,"base":354.9,"en303":true,"trim":2},{"id":"cffa2h","cat":"sum","num":"S11/0156993118","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":45.08,"en303":false,"trim":2},{"id":"iz6y8i","cat":"otros","num":"","fecha":"01/05/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"qp94s0","cat":"arr","num":"","fecha":"01/04/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"8gdhic","cat":"arr","num":"","fecha":"01/05/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"af8qum","cat":"arr","num":"","fecha":"01/06/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"qv2c4r","cat":"serv","num":"US-431074","fecha":"24/04/2025","proveedor":"Interaction Design Foundation","concepto":"Membership","iva":0,"base":240,"en303":true,"trim":2},{"id":"gqrj9y","cat":"serv","num":"US-431075","fecha":"24/04/2025","proveedor":"Interaction Design Foundation","concepto":"Masterclass","iva":0,"base":4.6,"en303":true,"trim":2},{"id":"cp55hq","cat":"serv","num":"US-432006","fecha":"01/05/2025","proveedor":"Interaction Design Foundation","concepto":"Masterclass","iva":0,"base":4.6,"en303":true,"trim":2},{"id":"vtwslz","cat":"otros","num":"1-62","fecha":"25/04/2025","proveedor":"Bohindra","concepto":"libros psicologia","iva":4,"base":41.21,"en303":false,"trim":2},{"id":"uxrwiq","cat":"otros","num":"62823","fecha":"27/05/2025","proveedor":"Azorin","concepto":"Libro Psicologia","iva":4,"base":28.8,"en303":false,"trim":2},{"id":"1obpl8","cat":"sum","num":"S11/0155573425","fecha":"01/05/2025","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"ktga82","cat":"otros","num":"","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"oteia4","cat":"sum","num":"S11/0154125428","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"eo7wr4","cat":"sum","num":"","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"sezxj3","cat":"sum","num":"21250716010339000","fecha":"12/04/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.24,"en303":false,"trim":2},{"id":"7z6lxf","cat":"sum","num":"21250612010274000","fecha":"12/06/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.86,"en303":false,"trim":2},{"id":"jonml3","cat":"sum","num":"21250515010310800","fecha":"15/05/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":19.87,"en303":false,"trim":2},{"id":"2n2w15","cat":"otros","num":"VE417056","fecha":"30/05/2025","proveedor":"LAN","concepto":"Material grafico","iva":21,"base":32.02,"en303":false,"trim":2},{"id":"a8cpz7","cat":"otros","num":"V2 014426","fecha":"30/05/2025","proveedor":"Folder","concepto":"Material grafico","iva":21,"base":10.83,"en303":false,"trim":2},{"id":"3y4db9","cat":"reta","num":"","fecha":"30/04/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"lw23ia","cat":"reta","num":"","fecha":"31/05/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"dlro2y","cat":"reta","num":"","fecha":"30/06/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"z23ejn","cat":"otros","num":"","fecha":"27/05/2025","proveedor":"ESCOLOR","concepto":"impresion color","iva":21,"base":31.41,"en303":false,"trim":2},{"id":"1hfsmw","cat":"sum","num":"","fecha":"06/08/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"fuxqd9","cat":"sum","num":"","fecha":"06/09/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"zxnf0t","cat":"sum","num":"","fecha":"06/07/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"6yewv5","cat":"otros","num":"","fecha":"18/08/2025","proveedor":"Reladays","concepto":"Escritorio","iva":21,"base":115.69,"en303":false,"trim":3},{"id":"h48t85","cat":"otros","num":"","fecha":"02/09/2025","proveedor":"Carlin","concepto":"Material de Oficina","iva":21,"base":4.79,"en303":false,"trim":3},{"id":"m9w63c","cat":"sum","num":"","fecha":"19/08/2025","proveedor":"iberdrola","concepto":"Luz","iva":21,"base":16.39,"en303":true,"trim":3},{"id":"ey3ono","cat":"sum","num":"","fecha":"11/09/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":12.01,"en303":true,"trim":3},{"id":"3kxp8a","cat":"sum","num":"","fecha":"06/10/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.39,"en303":true,"trim":3},{"id":"r4dwqw","cat":"otros","num":"","fecha":"11/07/2025","proveedor":"Bohindra","concepto":"Libros psicologia","iva":4,"base":19.23,"en303":false,"trim":3},{"id":"hq8zvp","cat":"otros","num":"62823","fecha":"27/05/2025","proveedor":"Azorin","concepto":"Libro psicologia","iva":4,"base":28.8,"en303":false,"trim":3},{"id":"kwbmiq","cat":"otros","num":"","fecha":"12/09/2025","proveedor":"Visor Libros","concepto":"Nexus","iva":4,"base":22.98,"en303":false,"trim":3},{"id":"h07d5d","cat":"osum","num":"","fecha":"26/08/2025","proveedor":"Ricardo Rubio Regadera","concepto":"impresiones","iva":21,"base":17.52,"en303":true,"trim":3},{"id":"69huy1","cat":"otros","num":"","fecha":"12/09/2025","proveedor":"Laie Librería","concepto":"Libros diseño","iva":4,"base":57.55,"en303":false,"trim":3},{"id":"r9tfyq","cat":"arr","num":"","fecha":"01/07/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"29n9un","cat":"arr","num":"","fecha":"01/08/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"i0g1zk","cat":"arr","num":"","fecha":"01/09/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"m72v79","cat":"serv","num":"","fecha":"01/07/2025","proveedor":"Interaction Design Foundation","concepto":"Master class","iva":0,"base":4.45,"en303":true,"trim":3},{"id":"gm7633","cat":"reta","num":"","fecha":"01/07/2025","proveedor":"SS RETA","concepto":"cuota autonomo","iva":0,"base":708.62,"en303":true,"trim":3},{"id":"vtox3b","cat":"reta","num":"","fecha":"01/08/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":3},{"id":"jg1mar","cat":"reta","num":"","fecha":"01/09/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.56,"en303":true,"trim":3},{"id":"bff823","cat":"sum","num":"","fecha":"16/11/2025","proveedor":"Jazztell","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"6jzie8","cat":"oduc","num":"","fecha":"19/12/2025","proveedor":"Craft 19","concepto":"Encuentro FUndaciones para el Clima","iva":10,"base":16.73,"en303":false,"trim":4},{"id":"lt8jk3","cat":"oduc","num":"","fecha":"19/10/2025","proveedor":"Esquinazo","concepto":"Excursion Avallainers","iva":10,"base":64.09,"en303":false,"trim":4},{"id":"2ziwag","cat":"trans","num":"","fecha":"19/09/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"z6jhia","cat":"trans","num":"","fecha":"07/11/2025","proveedor":"Consorcio","concepto":"Metrobus","iva":10,"base":6.64,"en303":false,"trim":4},{"id":"u56utb","cat":"trans","num":"","fecha":"28/09/2025","proveedor":"ATN Barcelona","concepto":"Viajes","iva":10,"base":11.41,"en303":false,"trim":4},{"id":"7v5h2a","cat":"trans","num":"","fecha":"11/07/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"suthcl","cat":"trans","num":"","fecha":"26/09/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"lsex00","cat":"sum","num":"","fecha":"05/12/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"2wae00","cat":"sum","num":"","fecha":"05/10/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"xbzdql","cat":"osum","num":"","fecha":"22/12/2025","proveedor":"Ricardo Rubio","concepto":"Impresiones","iva":21,"base":40.08,"en303":false,"trim":4},{"id":"c9l8z9","cat":"osum","num":"","fecha":"30/12/2025","proveedor":"Ferreteria oso","concepto":"Bombillas","iva":21,"base":5.29,"en303":false,"trim":4},{"id":"y1mo14","cat":"osum","num":"","fecha":"08/11/2025","proveedor":"WordPress","concepto":"pagina web","iva":21,"base":67,"en303":false,"trim":4},{"id":"vnbepx","cat":"sum","num":"","fecha":"13/11/2025","proveedor":"iberdrola","concepto":"Luz","iva":21,"base":17.36,"en303":false,"trim":4},{"id":"yxiozu","cat":"sum","num":"","fecha":"15/12/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":18.86,"en303":false,"trim":4},{"id":"w7752l","cat":"sum","num":"","fecha":"20/10/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":29.78,"en303":false,"trim":4},{"id":"tx9ihy","cat":"sum","num":"","fecha":"09/12/2025","proveedor":"Repsol","concepto":"Bombona calefaccion","iva":21,"base":12.78,"en303":false,"trim":4},{"id":"seloqn","cat":"otros","num":"","fecha":"12/12/2025","proveedor":"Eroski","concepto":"2 radiadores","iva":21,"base":65.95,"en303":false,"trim":4},{"id":"luycgd","cat":"trans","num":"","fecha":"28/09/2025","proveedor":"ATN Barcelona","concepto":"viajes","iva":21,"base":0.83,"en303":false,"trim":4},{"id":"uqo88z","cat":"arr","num":"","fecha":"01/10/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"xnbrfy","cat":"arr","num":"","fecha":"01/11/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"l24oa4","cat":"arr","num":"","fecha":"01/12/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"ucozeq","cat":"reta","num":"","fecha":"31/10/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"6td4hd","cat":"reta","num":"","fecha":"30/11/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"kpzv2l","cat":"reta","num":"","fecha":"31/12/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"9xhpd6","cat":"oduc","num":"","fecha":"","proveedor":"REGULARIZACION RETA ","concepto":"año 2023","iva":0,"base":340.36,"en303":true,"trim":1},{"id":"glskje","cat":"oduc","num":"","fecha":"","proveedor":"Amortizacion IMAC","concepto":"Compra 2021","iva":0,"base":261.22,"en303":true,"trim":1},{"id":"0ktkns","cat":"odeg","num":"","fecha":"Agosto 2021","proveedor":"Apple","concepto":"Imac (25%)","iva":21,"base":488.56,"en303":false,"trim":1,"objeto":"Bienes amortizables"}],"iva_notes":["","","",""],"irpf_notes":["","","",""],"irpf_pagado":[1460.99,1259.09,1677.91,1257.59],"iva_anual_nota":"","irpf_anual_nota":"","iva_pagado":[0,0,19.09,0],"salario_clientes":"Main client"},"yr_2026":{"facturas":[{"id":"aq3fvd","type":"ext","num":"400","fecha":"31/01/2026","cliente":"Main client","concepto":"Design services","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"nedk3t","type":"ext","num":"401","fecha":"28/02/2026","cliente":"Main client","concepto":"Design services","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"85ficb","type":"ext","num":"402","fecha":"31/03/2026","cliente":"Main client","concepto":"Design services","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"5vfy1m","type":"ext","num":"403","fecha":"30/04/2026","cliente":"Main client","concepto":"Design services","base":4731.92,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"ylycke","type":"ext","num":"404","fecha":"31/05/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"641ute","type":"ext","num":"405","fecha":"30/06/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"fqekfc","type":"esp","num":"407","fecha":"31/07/2026","cliente":"University","concepto":"Design services","base":2845.85,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"boxxc0","type":"ext","num":"406","fecha":"31/07/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"cnwxtr","type":"ext","num":"408","fecha":"15/08/2026","cliente":"Main client","concepto":"Design services","base":2580.63,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"cgetfs","type":"ext","num":"409","fecha":"15/09/2026","cliente":"Main client","concepto":"Design services","base":3892.45,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"yya6l0","type":"esp","num":"410","fecha":"15/09/2026","cliente":"University","concepto":"Design services","base":1950.6,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"qsrkk8","type":"esp","num":"411","fecha":"30/09/2026","cliente":"University","concepto":"Design Services","base":4826,"iva":21,"ret":true,"cobrada":false,"trim":3},{"id":"njq1ud","type":"ext","num":"412","fecha":"30/09/2026","cliente":"Main client","concepto":"Design services","base":2580.63,"iva":0,"ret":false,"cobrada":false,"trim":3}],"gastos":[{"id":"wyezdb","cat":"sum","num":"21260213010252909","fecha":"13/02/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":34.72,"en303":false,"trim":1},{"id":"3s9j63","cat":"sum","num":"21260313010272005","fecha":"13/03/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":24.07,"en303":false,"trim":1},{"id":"89otuh","cat":"osum","num":"21260313010272005","fecha":"30/01/2026","proveedor":"Tienda","concepto":"Material","iva":21,"base":29.46,"en303":false,"trim":1},{"id":"v9gfo1","cat":"trans","num":"BWUK20050760","fecha":"24/2/2026","proveedor":"Wizzair","concepto":"Vuelo Inglaterra (octubre)","iva":0,"base":437.92,"en303":true,"trim":1},{"id":"ik3u9k","cat":"serv","num":"","fecha":"9/01/2026","proveedor":"Escuela Digital","concepto":"curso diseño UX/UI","iva":0,"base":690,"en303":false,"trim":1},{"id":"s6uzf0","cat":"osum","num":"000448","fecha":"15/02/2026","proveedor":"Tienda","concepto":"material","iva":21,"base":15.64,"en303":false,"trim":1},{"id":"1z4zc7","cat":"serv","num":"JZ98FI04-0001","fecha":"25/3/2026","proveedor":"Anthropic, PBC","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":1},{"id":"m3vpzd","cat":"reta","num":"","fecha":"30/04/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"lt36tv","cat":"reta","num":"","fecha":"31/03/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"6lth2b","cat":"reta","num":"","fecha":"28/02/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"65ec6h","cat":"reta","num":"","fecha":"31/03/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"xkiji8","cat":"arr","num":"","fecha":"1/01/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"79qshj","cat":"arr","num":"","fecha":"1/02/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"arn1m8","cat":"arr","num":"","fecha":"1/03/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"y5g81f","cat":"arr","num":"","fecha":"1/04/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":2},{"id":"hxq7ry","cat":"sum","num":"313010","fecha":"31/03/2026","proveedor":"Repsol","concepto":"Calefaccion","iva":21,"base":8.59,"en303":false,"trim":1},{"id":"xc5jt1","cat":"sum","num":"S11/0166855641","fecha":"5/2/2026","proveedor":"Jazztel","concepto":"cuota enero (olviado 1T)","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"bmj6tu","cat":"sum","num":"S11/0168241474","fecha":"5/3/2026","proveedor":"Jazztel","concepto":"cuota febrero (olvidado 1T) ","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"7wg4fz","cat":"sum","num":"S11/0169613425","fecha":"5/04/2026","proveedor":"Jazztel","concepto":"cuota abril  (olvidado 1T) ","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"u3tb8h","cat":"sum","num":"21260414010266148","fecha":"14/04/2026","proveedor":"iberdrola","concepto":"Luz (olvido 1T) ","iva":10,"base":21.41,"en303":false,"trim":2},{"id":"469yyy","cat":"arr","num":"","fecha":"1/05/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":2},{"id":"5gjojz","cat":"serv","num":"JZ98FI04-0002","fecha":"25/04/2026","proveedor":"Anthropic, PBC","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":2},{"id":"jirtkj","cat":"sum","num":"21260514010236758","fecha":"14/05/2026","proveedor":"Iberdrola","concepto":"Luz  (IVA reducido)","iva":10,"base":16.55,"en303":false,"trim":2},{"id":"hkgfet","cat":"sum","num":"21260514010236758","fecha":"14/05/2026","proveedor":"Iberdrola","concepto":"Luz (iva normal)","iva":21,"base":0.74,"en303":false,"trim":2},{"id":"iked41","cat":"odeg","num":"05689","fecha":"18/01/2026","proveedor":"Tienda","concepto":"Terminal (25%)","iva":21,"base":250.02,"en303":false,"trim":1,"objeto":"Bienes amortizables"},{"id":"3pjofj","cat":"serv","num":"VSCDE0CC-0001","fecha":"26/05/2026","proveedor":"Cursor","concepto":"Cursor Pro","iva":21,"base":20,"en303":false,"trim":2},{"id":"xxy92p","cat":"otros","num":"","fecha":"6/06/2026","proveedor":"Fnac","concepto":"Libro teoría del color","iva":4,"base":125,"en303":false,"trim":2},{"id":"amj1b0","cat":"serv","num":"565956","fecha":"01/05/2026","proveedor":"Escuela digital","concepto":"No-code con Framer","iva":21,"base":380,"en303":false,"trim":2},{"id":"rl9pqs","cat":"serv","num":"25525265","fecha":"15/05/2026","proveedor":"Escuela digital ","concepto":"Auditoria de accesibilidad digital","iva":21,"base":380,"en303":false,"trim":2},{"id":"dsjuxi","cat":"sum","num":"212605140102369850","fecha":"12/06/2026","proveedor":"Iberdrola","concepto":"Luz (IVA reducido)","iva":10,"base":18.59,"en303":false,"trim":2},{"id":"9xnuxn","cat":"sum","num":"212605140102369850","fecha":"12/06/2026","proveedor":"Iberdrola","concepto":"Luz (IVA normal)","iva":21,"base":0.74,"en303":false,"trim":2},{"id":"ditrhe","cat":"reta","num":"","fecha":"31/05/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"neiceo","cat":"reta","num":"","fecha":"30/06/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"nckg3g","cat":"arr","num":"","fecha":"1/06/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.44,"en303":true,"trim":2},{"id":"ugab10","cat":"serv","num":"258","fecha":"31/05/2026","proveedor":"Asesoria","concepto":"Asesoria subvención","iva":21,"base":680,"en303":false,"trim":2},{"id":"dha0kb","cat":"reta","num":"","fecha":"31/07/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"bjf1ec","cat":"reta","num":"","fecha":"31/08/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"4c0mfm","cat":"arr","num":"","fecha":"1/07/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"of3qom","cat":"arr","num":"","fecha":"1/08/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"osk2df","cat":"sum","num":"S11/0166855641","fecha":"12/07/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"n84e6d","cat":"sum","num":"S11/0166855641","fecha":"12/08/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"ez6mcb","cat":"sum","num":"21260514010236758","fecha":"14/07/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":26.55,"en303":true,"trim":3},{"id":"swtoui","cat":"sum","num":"21260514010236758","fecha":"18/08/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":28.95,"en303":true,"trim":3},{"id":"nj8w95","cat":"reta","num":"","fecha":"30/09/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"akoib3","cat":"arr","num":"","fecha":"1/09/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"oorvwe","cat":"sum","num":"21260514010","fecha":"16/09/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":48.45,"en303":true,"trim":3},{"id":"3yxbyt","cat":"sum","num":"S11/0166855641","fecha":"12/09/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"949ngw","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/07/2026","proveedor":"Cursor","concepto":"Cursor Pro","iva":21,"base":20,"en303":true,"trim":3},{"id":"ulx7os","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/08/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":true,"trim":3},{"id":"rqdp85","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/09/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":true,"trim":3},{"id":"z8dmgs","cat":"otros","num":"VSCDE0CC-0001","fecha":"1/9/2026","proveedor":"Papeleria","concepto":"Materiales","iva":21,"base":158.95,"en303":true,"trim":3}],"iva_notes":["","","",""],"irpf_notes":["","","",""],"irpf_pagado":[1367.23,2141.63,0,0],"iva_anual_nota":"","irpf_anual_nota":"","iva_pagado":[0,0,0,0],"salario_clientes":"Main client","iva_compensar_amt":[0,0,151.8,0],"iva_compensar_on":[false,false,true,false]}};
+let __appData = {"_years":[2025,2026],"yr_2025":{"facturas":[{"id":"lny4mn","type":"ext","num":"300","fecha":"31/01/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"zzogqd","type":"ext","num":"301","fecha":"28/02/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4761.92,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"y1ubje","type":"ext","num":"302","fecha":"31/03/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"pkmffu","type":"ext","num":"303","fecha":"30/04/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"y3w43i","type":"ext","num":"304","fecha":"31/05/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4761.92,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"4kjw65","type":"ext","num":"305","fecha":"30/06/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"00gsyo","type":"esp","num":"306","fecha":"03/07/2025","cliente":"Asociación Espacio Geranios","concepto":"Servicios de diseño","base":264.15,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"q8lq0g","type":"ext","num":"307","fecha":"31/07/2025","cliente":"Main client","concepto":"Servicios de diseño","base":3571.35,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"zby235","type":"ext","num":"308","fecha":"31/08/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.62,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"o84vj8","type":"ext","num":"309","fecha":"30/09/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"a4pzss","type":"ext","num":"310","fecha":"31/10/2025","cliente":"Main client","concepto":"Servicios de diseño","base":5357.15,"iva":0,"ret":false,"cobrada":true,"trim":4},{"id":"b3b7rs","type":"ext","num":"311","fecha":"30/11/2025","cliente":"Main client","concepto":"Servicios de diseño","base":4166.62,"iva":0,"ret":false,"cobrada":true,"trim":4},{"id":"9zph1l","type":"ext","num":"312","fecha":"31/12/2025","cliente":"Main client","concepto":"Servicios de diseño","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":4}],"gastos":[{"id":"29tpmo","cat":"arr","num":"","fecha":"01/01/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"62b2ir","cat":"arr","num":"","fecha":"01/02/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"xqofao","cat":"arr","num":"","fecha":"01/03/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":1},{"id":"aslpy9","cat":"serv","num":"309FA67E-2176","fecha":"25/01/2025","proveedor":"Daniel Smith","concepto":"English - 21 days challenge","iva":0,"base":79,"en303":true,"trim":1},{"id":"17rubz","cat":"serv","num":"K10016488099","fecha":"20/01/2025","proveedor":"italki","concepto":"English - Morag","iva":0,"base":101.48,"en303":true,"trim":1},{"id":"nlcs8j","cat":"serv","num":"309FA67E-2267","fecha":"31/03/2025","proveedor":"Daniel Smith","concepto":"English - 21 days challenge","iva":0,"base":79,"en303":true,"trim":1},{"id":"wbpzwn","cat":"serv","num":"K10016702078","fecha":"16/02/2025","proveedor":"italki","concepto":"English - Morag","iva":0,"base":103.56,"en303":true,"trim":1},{"id":"dpqwo2","cat":"sum","num":"S11/0152688765","fecha":"06/04/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":34.42,"en303":false,"trim":1},{"id":"oabqb5","cat":"sum","num":"S11/0151228002","fecha":"06/03/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":37.65,"en303":false,"trim":1},{"id":"ytbxb3","cat":"sum","num":"S11/0149765412","fecha":"06/02/2025","proveedor":"Jazztel","concepto":"telefonia","iva":21,"base":37.65,"en303":false,"trim":1},{"id":"oqpfhp","cat":"otros","num":"","fecha":"06/04/2025","proveedor":"jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"y81158","cat":"otros","num":"","fecha":"06/03/2025","proveedor":"Jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"ybhwed","cat":"otros","num":"","fecha":"06/02/2025","proveedor":"Jazztel","concepto":"cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":1},{"id":"5unpeg","cat":"sum","num":"21250219010440100","fecha":"19/02/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":26.02,"en303":false,"trim":1},{"id":"1urv75","cat":"sum","num":"21250313010299300","fecha":"13/03/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":18.26,"en303":false,"trim":1},{"id":"17g9fq","cat":"sum","num":"21250411010283500","fecha":"11/04/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":20.84,"en303":false,"trim":1},{"id":"fwyrjt","cat":"reta","num":"","fecha":"31/01/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":false,"trim":1},{"id":"nj5ynb","cat":"reta","num":"","fecha":"28/02/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":true,"trim":1},{"id":"x7bdde","cat":"reta","num":"","fecha":"31/03/2025","proveedor":"SS RETA","concepto":"cuota de autonomo","iva":0,"base":708.62,"en303":true,"trim":1},{"id":"bsviwz","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"aeropuerto Barajas quiosco","concepto":"Lunch pack","iva":10,"base":8.17,"en303":false,"trim":2},{"id":"6lrkuk","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"Varios / edreams","concepto":"Viaje London - Cambridge","iva":0,"base":184.85,"en303":true,"trim":2},{"id":"tohs1y","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"UK GOV","concepto":"ETA - certificado","iva":0,"base":19.78,"en303":true,"trim":2},{"id":"red0te","cat":"trans","num":"05286760CX576412C","fecha":"08/06/2025","proveedor":"Booking","concepto":"Hotel cambridge","iva":0,"base":95.68,"en303":true,"trim":2},{"id":"7yfaps","cat":"trans","num":"","fecha":"02/06/2025","proveedor":"Viaje coche personal","concepto":"Km de viaje 71,5*2*0,26","iva":0,"base":37.18,"en303":true,"trim":2},{"id":"abk3ob","cat":"trans","num":"","fecha":"04/06/2025","proveedor":"Varios England","concepto":"","iva":0,"base":354.9,"en303":true,"trim":2},{"id":"cffa2h","cat":"sum","num":"S11/0156993118","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":45.08,"en303":false,"trim":2},{"id":"iz6y8i","cat":"otros","num":"","fecha":"01/05/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"qp94s0","cat":"arr","num":"","fecha":"01/04/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"8gdhic","cat":"arr","num":"","fecha":"01/05/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"af8qum","cat":"arr","num":"","fecha":"01/06/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":260,"en303":true,"trim":2},{"id":"qv2c4r","cat":"serv","num":"US-431074","fecha":"24/04/2025","proveedor":"Interaction Design Foundation","concepto":"Membership","iva":0,"base":240,"en303":true,"trim":2},{"id":"gqrj9y","cat":"serv","num":"US-431075","fecha":"24/04/2025","proveedor":"Interaction Design Foundation","concepto":"Masterclass","iva":0,"base":4.6,"en303":true,"trim":2},{"id":"cp55hq","cat":"serv","num":"US-432006","fecha":"01/05/2025","proveedor":"Interaction Design Foundation","concepto":"Masterclass","iva":0,"base":4.6,"en303":true,"trim":2},{"id":"vtwslz","cat":"otros","num":"1-62","fecha":"25/04/2025","proveedor":"Bohindra","concepto":"libros psicologia","iva":4,"base":41.21,"en303":false,"trim":2},{"id":"uxrwiq","cat":"otros","num":"62823","fecha":"27/05/2025","proveedor":"Azorin","concepto":"Libro Psicologia","iva":4,"base":28.8,"en303":false,"trim":2},{"id":"1obpl8","cat":"sum","num":"S11/0155573425","fecha":"01/05/2025","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"ktga82","cat":"otros","num":"","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"oteia4","cat":"sum","num":"S11/0154125428","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"eo7wr4","cat":"sum","num":"","fecha":"01/06/2025","proveedor":"Jazztel","concepto":"Cuota OPPO","iva":21,"base":6.6,"en303":false,"trim":2},{"id":"sezxj3","cat":"sum","num":"21250716010339000","fecha":"12/04/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.24,"en303":false,"trim":2},{"id":"7z6lxf","cat":"sum","num":"21250612010274000","fecha":"12/06/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.86,"en303":false,"trim":2},{"id":"jonml3","cat":"sum","num":"21250515010310800","fecha":"15/05/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":19.87,"en303":false,"trim":2},{"id":"2n2w15","cat":"otros","num":"VE417056","fecha":"30/05/2025","proveedor":"LAN","concepto":"Material grafico","iva":21,"base":32.02,"en303":false,"trim":2},{"id":"a8cpz7","cat":"otros","num":"V2 014426","fecha":"30/05/2025","proveedor":"Folder","concepto":"Material grafico","iva":21,"base":10.83,"en303":false,"trim":2},{"id":"3y4db9","cat":"reta","num":"","fecha":"30/04/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"lw23ia","cat":"reta","num":"","fecha":"31/05/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"dlro2y","cat":"reta","num":"","fecha":"30/06/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":2},{"id":"z23ejn","cat":"otros","num":"","fecha":"27/05/2025","proveedor":"ESCOLOR","concepto":"impresion color","iva":21,"base":31.41,"en303":false,"trim":2},{"id":"1hfsmw","cat":"sum","num":"","fecha":"06/08/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"fuxqd9","cat":"sum","num":"","fecha":"06/09/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"zxnf0t","cat":"sum","num":"","fecha":"06/07/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"6yewv5","cat":"otros","num":"","fecha":"18/08/2025","proveedor":"Reladays","concepto":"Escritorio","iva":21,"base":115.69,"en303":false,"trim":3},{"id":"h48t85","cat":"otros","num":"","fecha":"02/09/2025","proveedor":"Carlin","concepto":"Material de Oficina","iva":21,"base":4.79,"en303":false,"trim":3},{"id":"m9w63c","cat":"sum","num":"","fecha":"19/08/2025","proveedor":"iberdrola","concepto":"Luz","iva":21,"base":16.39,"en303":true,"trim":3},{"id":"ey3ono","cat":"sum","num":"","fecha":"11/09/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":12.01,"en303":true,"trim":3},{"id":"3kxp8a","cat":"sum","num":"","fecha":"06/10/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":14.39,"en303":true,"trim":3},{"id":"r4dwqw","cat":"otros","num":"","fecha":"11/07/2025","proveedor":"Bohindra","concepto":"Libros psicologia","iva":4,"base":19.23,"en303":false,"trim":3},{"id":"hq8zvp","cat":"otros","num":"62823","fecha":"27/05/2025","proveedor":"Azorin","concepto":"Libro psicologia","iva":4,"base":28.8,"en303":false,"trim":3},{"id":"kwbmiq","cat":"otros","num":"","fecha":"12/09/2025","proveedor":"Visor Libros","concepto":"Nexus","iva":4,"base":22.98,"en303":false,"trim":3},{"id":"h07d5d","cat":"osum","num":"","fecha":"26/08/2025","proveedor":"Ricardo Rubio Regadera","concepto":"impresiones","iva":21,"base":17.52,"en303":true,"trim":3},{"id":"69huy1","cat":"otros","num":"","fecha":"12/09/2025","proveedor":"Laie Librería","concepto":"Libros diseño","iva":4,"base":57.55,"en303":false,"trim":3},{"id":"r9tfyq","cat":"arr","num":"","fecha":"01/07/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"29n9un","cat":"arr","num":"","fecha":"01/08/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"i0g1zk","cat":"arr","num":"","fecha":"01/09/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"m72v79","cat":"serv","num":"","fecha":"01/07/2025","proveedor":"Interaction Design Foundation","concepto":"Master class","iva":0,"base":4.45,"en303":true,"trim":3},{"id":"gm7633","cat":"reta","num":"","fecha":"01/07/2025","proveedor":"SS RETA","concepto":"cuota autonomo","iva":0,"base":708.62,"en303":true,"trim":3},{"id":"vtox3b","cat":"reta","num":"","fecha":"01/08/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":3},{"id":"jg1mar","cat":"reta","num":"","fecha":"01/09/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.56,"en303":true,"trim":3},{"id":"bff823","cat":"sum","num":"","fecha":"16/11/2025","proveedor":"Jazztell","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"6jzie8","cat":"oduc","num":"","fecha":"19/12/2025","proveedor":"Craft 19","concepto":"Encuentro FUndaciones para el Clima","iva":10,"base":16.73,"en303":false,"trim":4},{"id":"lt8jk3","cat":"oduc","num":"","fecha":"19/10/2025","proveedor":"Esquinazo","concepto":"Excursion Avallainers","iva":10,"base":64.09,"en303":false,"trim":4},{"id":"2ziwag","cat":"trans","num":"","fecha":"19/09/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"z6jhia","cat":"trans","num":"","fecha":"07/11/2025","proveedor":"Consorcio","concepto":"Metrobus","iva":10,"base":6.64,"en303":false,"trim":4},{"id":"u56utb","cat":"trans","num":"","fecha":"28/09/2025","proveedor":"ATN Barcelona","concepto":"Viajes","iva":10,"base":11.41,"en303":false,"trim":4},{"id":"7v5h2a","cat":"trans","num":"","fecha":"11/07/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"suthcl","cat":"trans","num":"","fecha":"26/09/2025","proveedor":"Consorcio","concepto":"10 viajes interurbanos","iva":10,"base":16.18,"en303":false,"trim":4},{"id":"lsex00","cat":"sum","num":"","fecha":"05/12/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"2wae00","cat":"sum","num":"","fecha":"05/10/2025","proveedor":"Jazztel","concepto":"internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"xbzdql","cat":"osum","num":"","fecha":"22/12/2025","proveedor":"Ricardo Rubio","concepto":"Impresiones","iva":21,"base":40.08,"en303":false,"trim":4},{"id":"c9l8z9","cat":"osum","num":"","fecha":"30/12/2025","proveedor":"Ferreteria oso","concepto":"Bombillas","iva":21,"base":5.29,"en303":false,"trim":4},{"id":"y1mo14","cat":"osum","num":"","fecha":"08/11/2025","proveedor":"WordPress","concepto":"pagina web","iva":21,"base":67,"en303":false,"trim":4},{"id":"vnbepx","cat":"sum","num":"","fecha":"13/11/2025","proveedor":"iberdrola","concepto":"Luz","iva":21,"base":17.36,"en303":false,"trim":4},{"id":"yxiozu","cat":"sum","num":"","fecha":"15/12/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":18.86,"en303":false,"trim":4},{"id":"w7752l","cat":"sum","num":"","fecha":"20/10/2025","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":29.78,"en303":false,"trim":4},{"id":"tx9ihy","cat":"sum","num":"","fecha":"09/12/2025","proveedor":"Repsol","concepto":"Bombona calefaccion","iva":21,"base":12.78,"en303":false,"trim":4},{"id":"seloqn","cat":"otros","num":"","fecha":"12/12/2025","proveedor":"Eroski","concepto":"2 radiadores","iva":21,"base":65.95,"en303":false,"trim":4},{"id":"luycgd","cat":"trans","num":"","fecha":"28/09/2025","proveedor":"ATN Barcelona","concepto":"viajes","iva":21,"base":0.83,"en303":false,"trim":4},{"id":"uqo88z","cat":"arr","num":"","fecha":"01/10/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"xnbrfy","cat":"arr","num":"","fecha":"01/11/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"l24oa4","cat":"arr","num":"","fecha":"01/12/2025","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":4},{"id":"ucozeq","cat":"reta","num":"","fecha":"31/10/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"6td4hd","cat":"reta","num":"","fecha":"30/11/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"kpzv2l","cat":"reta","num":"","fecha":"31/12/2025","proveedor":"SS RETA","concepto":"cuota autónomo","iva":0,"base":708.62,"en303":true,"trim":4},{"id":"9xhpd6","cat":"oduc","num":"","fecha":"","proveedor":"REGULARIZACION RETA ","concepto":"año 2023","iva":0,"base":340.36,"en303":true,"trim":1},{"id":"glskje","cat":"oduc","num":"","fecha":"","proveedor":"Amortizacion IMAC","concepto":"Compra 2021","iva":0,"base":261.22,"en303":true,"trim":1},{"id":"0ktkns","cat":"odeg","num":"","fecha":"Agosto 2021","proveedor":"Apple","concepto":"Imac (25%)","iva":21,"base":488.56,"en303":false,"trim":1,"objeto":"Bienes amortizables"}],"iva_notes":["","","",""],"irpf_notes":["","","",""],"irpf_pagado":[1460.99,1259.09,1677.91,1257.59],"iva_anual_nota":"","irpf_anual_nota":"","iva_pagado":[0,0,19.09,0],"salario_clientes":"Main client","iva_compensar_amt":[0,0,0,0],"iva_compensar_on":[false,false,false,false]},"yr_2026":{"facturas":[{"id":"aq3fvd","type":"ext","num":"400","fecha":"31/01/2026","cliente":"Main client","concepto":"Design services","base":2976.52,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"nedk3t","type":"ext","num":"401","fecha":"28/02/2026","cliente":"Main client","concepto":"Design services","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"85ficb","type":"ext","num":"402","fecha":"31/03/2026","cliente":"Main client","concepto":"Design services","base":4166.63,"iva":0,"ret":false,"cobrada":true,"trim":1},{"id":"5vfy1m","type":"ext","num":"403","fecha":"30/04/2026","cliente":"Main client","concepto":"Design services","base":4731.92,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"ylycke","type":"ext","num":"404","fecha":"31/05/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"641ute","type":"ext","num":"405","fecha":"30/06/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":2},{"id":"fqekfc","type":"esp","num":"407","fecha":"31/07/2026","cliente":"University","concepto":"Design services","base":2845.85,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"boxxc0","type":"ext","num":"406","fecha":"31/07/2026","cliente":"Main client","concepto":"Design services","base":5357.5,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"cnwxtr","type":"ext","num":"408","fecha":"15/08/2026","cliente":"Main client","concepto":"Design services","base":2580.63,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"cgetfs","type":"ext","num":"409","fecha":"15/09/2026","cliente":"Main client","concepto":"Design services","base":3892.45,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"yya6l0","type":"esp","num":"410","fecha":"15/09/2026","cliente":"University","concepto":"Design services","base":1950.6,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"qsrkk8","type":"esp","num":"411","fecha":"30/09/2026","cliente":"University","concepto":"Design Services","base":4826,"iva":21,"ret":true,"cobrada":true,"trim":3},{"id":"njq1ud","type":"ext","num":"412","fecha":"30/09/2026","cliente":"Main client","concepto":"Design services","base":2580.63,"iva":0,"ret":false,"cobrada":true,"trim":3},{"id":"04yol4","type":"ext","num":"413","fecha":"30/10/2026","cliente":"Main client","concepto":"Servicios de diseño","base":4295,"iva":0,"ret":false,"cobrada":false,"trim":4},{"id":"e9cgfh","type":"ext","num":"412","fecha":"02/11/2026","cliente":"Main client","concepto":"Servicios de diseño","base":1356,"iva":0,"ret":false,"cobrada":true,"trim":4},{"id":"5lmlq2","type":"esp","num":"414","fecha":"09/11/2026","cliente":"University","concepto":"Servicios de diseño","base":1484,"iva":21,"ret":true,"cobrada":false,"trim":4}],"gastos":[{"id":"wyezdb","cat":"sum","num":"21260213010252909","fecha":"13/02/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":34.72,"en303":false,"trim":1},{"id":"3s9j63","cat":"sum","num":"21260313010272005","fecha":"13/03/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":24.07,"en303":false,"trim":1},{"id":"89otuh","cat":"osum","num":"21260313010272005","fecha":"30/01/2026","proveedor":"Tienda","concepto":"Material","iva":21,"base":29.46,"en303":false,"trim":1},{"id":"v9gfo1","cat":"trans","num":"BWUK20050760","fecha":"24/2/2026","proveedor":"Wizzair","concepto":"Vuelo Inglaterra (octubre)","iva":0,"base":437.92,"en303":true,"trim":1},{"id":"ik3u9k","cat":"serv","num":"","fecha":"9/01/2026","proveedor":"Escuela Digital","concepto":"curso diseño UX/UI","iva":0,"base":690,"en303":false,"trim":1},{"id":"s6uzf0","cat":"osum","num":"000448","fecha":"15/02/2026","proveedor":"Tienda","concepto":"material","iva":21,"base":15.64,"en303":false,"trim":1},{"id":"1z4zc7","cat":"serv","num":"JZ98FI04-0001","fecha":"25/3/2026","proveedor":"Anthropic, PBC","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":1},{"id":"m3vpzd","cat":"reta","num":"","fecha":"30/04/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"lt36tv","cat":"reta","num":"","fecha":"31/03/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"6lth2b","cat":"reta","num":"","fecha":"28/02/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"65ec6h","cat":"reta","num":"","fecha":"31/03/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":true,"trim":1},{"id":"xkiji8","cat":"arr","num":"","fecha":"1/01/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"79qshj","cat":"arr","num":"","fecha":"1/02/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"arn1m8","cat":"arr","num":"","fecha":"1/03/2026","proveedor":"Agencia Alquiler","concepto":"alquiler","iva":0,"base":265.46,"en303":true,"trim":1},{"id":"y5g81f","cat":"arr","num":"","fecha":"1/04/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":2},{"id":"hxq7ry","cat":"sum","num":"313010","fecha":"31/03/2026","proveedor":"Repsol","concepto":"Calefaccion","iva":21,"base":8.59,"en303":false,"trim":1},{"id":"xc5jt1","cat":"sum","num":"S11/0166855641","fecha":"5/2/2026","proveedor":"Jazztel","concepto":"cuota enero (olviado 1T)","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"bmj6tu","cat":"sum","num":"S11/0168241474","fecha":"5/3/2026","proveedor":"Jazztel","concepto":"cuota febrero (olvidado 1T) ","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"7wg4fz","cat":"sum","num":"S11/0169613425","fecha":"5/04/2026","proveedor":"Jazztel","concepto":"cuota abril  (olvidado 1T) ","iva":21,"base":37.65,"en303":false,"trim":2},{"id":"u3tb8h","cat":"sum","num":"21260414010266148","fecha":"14/04/2026","proveedor":"iberdrola","concepto":"Luz (olvido 1T) ","iva":10,"base":21.41,"en303":false,"trim":2},{"id":"469yyy","cat":"arr","num":"","fecha":"1/05/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":2},{"id":"5gjojz","cat":"serv","num":"JZ98FI04-0002","fecha":"25/04/2026","proveedor":"Anthropic, PBC","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":2},{"id":"jirtkj","cat":"sum","num":"21260514010236758","fecha":"14/05/2026","proveedor":"Iberdrola","concepto":"Luz  (IVA reducido)","iva":10,"base":16.55,"en303":false,"trim":2},{"id":"hkgfet","cat":"sum","num":"21260514010236758","fecha":"14/05/2026","proveedor":"Iberdrola","concepto":"Luz (iva normal)","iva":21,"base":0.74,"en303":false,"trim":2},{"id":"iked41","cat":"odeg","num":"05689","fecha":"18/01/2026","proveedor":"Tienda","concepto":"Terminal (25%)","iva":21,"base":250.02,"en303":false,"trim":1,"objeto":"Bienes amortizables"},{"id":"3pjofj","cat":"serv","num":"VSCDE0CC-0001","fecha":"26/05/2026","proveedor":"Cursor","concepto":"Cursor Pro","iva":21,"base":20,"en303":false,"trim":2},{"id":"xxy92p","cat":"otros","num":"","fecha":"6/06/2026","proveedor":"Fnac","concepto":"Libro teoría del color","iva":4,"base":125,"en303":false,"trim":2},{"id":"amj1b0","cat":"serv","num":"565956","fecha":"01/05/2026","proveedor":"Escuela digital","concepto":"No-code con Framer","iva":21,"base":380,"en303":false,"trim":2},{"id":"rl9pqs","cat":"serv","num":"25525265","fecha":"15/05/2026","proveedor":"Escuela digital ","concepto":"Auditoria de accesibilidad digital","iva":21,"base":380,"en303":false,"trim":2},{"id":"dsjuxi","cat":"sum","num":"212605140102369850","fecha":"12/06/2026","proveedor":"Iberdrola","concepto":"Luz (IVA reducido)","iva":10,"base":18.59,"en303":false,"trim":2},{"id":"9xnuxn","cat":"sum","num":"212605140102369850","fecha":"12/06/2026","proveedor":"Iberdrola","concepto":"Luz (IVA normal)","iva":21,"base":0.74,"en303":false,"trim":2},{"id":"ditrhe","cat":"reta","num":"","fecha":"31/05/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"neiceo","cat":"reta","num":"","fecha":"30/06/2026","proveedor":"RETA","concepto":"Cuota autónomo","iva":0,"base":722.88,"en303":false,"trim":2},{"id":"nckg3g","cat":"arr","num":"","fecha":"1/06/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.44,"en303":true,"trim":2},{"id":"ugab10","cat":"serv","num":"258","fecha":"31/05/2026","proveedor":"Asesoria","concepto":"Asesoria subvención","iva":21,"base":680,"en303":false,"trim":2},{"id":"dha0kb","cat":"reta","num":"","fecha":"31/07/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"bjf1ec","cat":"reta","num":"","fecha":"31/08/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"4c0mfm","cat":"arr","num":"","fecha":"1/07/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"of3qom","cat":"arr","num":"","fecha":"1/08/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"osk2df","cat":"sum","num":"S11/0166855641","fecha":"12/07/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"n84e6d","cat":"sum","num":"S11/0166855641","fecha":"12/08/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"ez6mcb","cat":"sum","num":"21260514010236758","fecha":"14/07/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":26.55,"en303":true,"trim":3},{"id":"swtoui","cat":"sum","num":"21260514010236758","fecha":"18/08/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":28.95,"en303":true,"trim":3},{"id":"nj8w95","cat":"reta","num":"","fecha":"30/09/2026","proveedor":"RETA","concepto":"Cuota autónomos","iva":0,"base":722.88,"en303":false,"trim":3},{"id":"akoib3","cat":"arr","num":"","fecha":"1/09/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.46,"en303":true,"trim":3},{"id":"oorvwe","cat":"sum","num":"21260514010","fecha":"16/09/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":48.45,"en303":true,"trim":3},{"id":"3yxbyt","cat":"sum","num":"S11/0166855641","fecha":"12/09/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":true,"trim":3},{"id":"949ngw","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/07/2026","proveedor":"Cursor","concepto":"Cursor Pro","iva":21,"base":20,"en303":true,"trim":3},{"id":"ulx7os","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/08/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":true,"trim":3},{"id":"rqdp85","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/09/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":true,"trim":3},{"id":"z8dmgs","cat":"otros","num":"VSCDE0CC-0001","fecha":"1/9/2026","proveedor":"Papeleria","concepto":"Materiales","iva":21,"base":158.95,"en303":true,"trim":3},{"id":"doi3hh","cat":"reta","num":"","fecha":"31/10/2026","proveedor":"RETA","concepto":"Cuota Autónomos","iva":0,"base":722.88,"en303":false,"trim":4},{"id":"lrui8t","cat":"arr","num":"","fecha":"01/10/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.38,"en303":true,"trim":4},{"id":"mjk60v","cat":"arr","num":"","fecha":"01/11/2026","proveedor":"Agencia Alquiler","concepto":"Alquiler","iva":0,"base":265.38,"en303":true,"trim":4},{"id":"wiszjx","cat":"sum","num":"","fecha":"12/10/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"zm4lw7","cat":"sum","num":"","fecha":"12/11/2026","proveedor":"Jazztel","concepto":"Internet","iva":21,"base":37.65,"en303":false,"trim":4},{"id":"ap791x","cat":"sum","num":"21260514021","fecha":"16/10/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":64.8,"en303":false,"trim":4},{"id":"f1y9bz","cat":"sum","num":"21260514024","fecha":"16/11/2026","proveedor":"Iberdrola","concepto":"Luz","iva":21,"base":68.7,"en303":false,"trim":4},{"id":"0yq4js","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/10/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":4},{"id":"29vkmr","cat":"serv","num":"VSCDE0CC-0001","fecha":"15/11/2026","proveedor":"Anthropic","concepto":"Claude Pro","iva":21,"base":18,"en303":false,"trim":4},{"id":"7j9a6u","cat":"serv","num":"","fecha":"01/11/2026","proveedor":"Academia de idiomas","concepto":"Inglés","iva":0,"base":240,"en303":true,"trim":4}],"iva_notes":["","","",""],"irpf_notes":["","","",""],"irpf_pagado":[1367.23,2141.63,0,0],"iva_anual_nota":"","irpf_anual_nota":"","iva_pagado":[0,0,0,0],"salario_clientes":"Main client","iva_compensar_amt":[0,0,151.8,0],"iva_compensar_on":[false,false,true,false]}};
 
 // ─── Year management ──────────────────────────────────────────────────────────
 function getAllYears(){
