@@ -37,20 +37,21 @@ Turns one option on or off. The two labels say what each side means: in the app 
 <Canvas of={SelectorStories.Switch} />
 <Controls of={SelectorStories.Switch} />
 
-## Choice (radio card)
+## Choice card
 
-A radio option shown as a card, when each option needs a title and a short explanation. Real case: **Guardar copia .html** (Local app), *Versión actual (con datos)* / *Versión vacía (sin datos)*. The selected card gets the accent border and tint.
+A radio or checkbox option shown as a card, when each option needs a title and a short explanation. Same look, different syntax:
 
-<a href="./?path=/story/app-components-dialog--save-copy" target="_top">Dialog view →</a>
+- **Radio: one choice.** The options are exclusive. Real case: **Guardar copia .html** (Local app), *Versión actual (con datos)* / *Versión vacía (sin datos)*.
+- **Checkbox: several choices.** Any number of cards can be on. Not in the app yet.
 
-```html
-<fieldset class="choice-group"><legend class="sr-only">Versión</legend>
-  <label class="choice"><input type="radio" name="v" checked>
-    <span class="choice__text"><b class="choice__title">Versión actual (con datos)</b>
-    <span class="choice__desc">Guarda la contabilidad registrada actual.</span></span></label>
-  …
-</fieldset>
-```
+The selected card gets the accent border and tint; hover shows the accent border; the focus ring goes around the whole card.
+
+<Canvas of={SelectorStories.Choice} />
+<Controls of={SelectorStories.Choice} />
+
+In the app, the two radio cards of **Guardar copia .html** (<a href="./?path=/story/app-components-dialog--save-copy" target="_top">Dialog view →</a>):
+
+<Canvas of={SelectorStories.ChoiceGroup} />
 
 ## Chip (static)
 
@@ -80,6 +81,12 @@ A label you can't click: the app name in the header, and the tax-form box codes 
 | | Right text (ON) | Text | any word | "Eng" |
 | | Left text (OFF) | Text | any word | "Esp" |
 | | Accessible name | Text | screen readers | "English" |
+| **Choice card** | Colour | Variant | Blue · Orange | Blue |
+| | Kind | Variant | Radio (one choice) · Checkbox (several choices) | Radio |
+| | State | Variant | Default · Hover · Disabled · Focus | Default |
+| | Checked | Boolean | selected · deselected | selected |
+| | Title | Text | | "Versión actual (con datos)" |
+| | Description | Text | | "Guarda la contabilidad registrada actual." |
 | **Chip** | Type | Variant | Brand (green outline) · Code (grey) | Brand |
 | | Text | Text | | "Contabilidad" |
 
@@ -87,7 +94,7 @@ A label you can't click: the app name in the header, and the tax-form box codes 
 
 <Canvas of={SelectorStories.States} sourceState="none" />
 
-Checkbox, radio and switch: **selected / deselected** (on / off), **focus** and **disabled**; no hover change, the pointer over them is enough. The clickable status dot: **Cobrada / Pendiente**, **hover** (grey circle) and **focus**. All use the yellow focus ring.
+Checkbox, radio and switch: **selected / deselected** (on / off), **focus** and **disabled**; no hover change, the pointer over them is enough. The choice card also has **hover** (accent border), and its focus ring goes around the whole card. The clickable status dot: **Cobrada / Pendiente**, **hover** (grey circle) and **focus**. All use the yellow focus ring.
 
 ## Spec
 
@@ -96,6 +103,7 @@ Checkbox, radio and switch: **selected / deselected** (on / off), **focus** and 
 | Checkbox / radio | native control, `--check-size` 20px (forms) · `--check-size-sm` 16px (table rows) · colour from `field--primary` / `field--attention` (`accent-color`) · label Sans 14 (12 for sm), 8px gap |
 | Status dot | `--dot-size` 8px round · Cobrada `--brand` · Pendiente `--attention` · 1px `--text-muted` ring on every dot · clickable: 24px round button, `--fill` on hover |
 | Switch | track `--switch-w` 48 × `--switch-h` 24, pill · thumb 20px white with `--shadow-sm` · off track `--text-muted`, on track `--primary` · labels Mono 12 caps, the active one bold, **outside the button**, 12px gap · clicking a label sets that side |
+| Choice card | `--border-thin` `--line-strong` border, `--surface` · 12px 16px padding, 12px gap · control 20px · title Sans 16 medium · description Sans 14 `--text-muted` · selected: 2px accent border + `--field-tint` · hover: accent border · disabled: `--line` border, `--disabled` text · group: 8px gap |
 | Chip · brand | `--chip-h` 24px · `--surface` with a 2px `--brand` outline · Mono 12 bold caps · 8px padding |
 | Chip · code | `--chip-h-sm` 16px · `--fill` + `--text-muted` · Mono 10 · `--radius-sm` · 4px padding |
 
@@ -110,6 +118,7 @@ Checkbox, radio and switch: **selected / deselected** (on / off), **focus** and 
 - **Switch / toggle** is a `<button role="switch" aria-checked>` (`switch__control`), read as "English, switch, off". The accessible name says what turning it on does.
 - The two labels (Esp / Eng) sit **outside the button**, hidden from screen readers. If they were inside, the visible text ("Esp Eng") and the name ("English") wouldn't match, and voice-control users saying "click Eng" couldn't reach it (WCAG 2.5.3, *label in name*). Clicking a label still works: it sets that side.
 - Hiding the visible labels keeps the accessible name.
+- **Choice cards** are native `<input>`s inside a `<label>`: the whole card is clickable. Group them in a `<fieldset>` with a `<legend>` (can be visually hidden) so screen readers announce what is being chosen. Radio cards share one `name`.
 - **Chips** are plain text: not focusable, not clickable. If it needs to be clicked, use a Tab or a Button.
 
 ## CSS

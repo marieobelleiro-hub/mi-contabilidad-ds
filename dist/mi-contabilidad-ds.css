@@ -670,9 +670,11 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
 .switch:has(.switch__control:disabled) :is(.switch__off,.switch__on,.switch__control){cursor:not-allowed}
 .switch__control:disabled .switch__track{background:var(--disabled)}
 
-/* ── Choice: a radio option as a card (Guardar copia .html) ──
+/* ── Choice card: a radio (one choice) or checkbox (several) option as a card (Guardar copia .html) ──
    <label class="choice"><input type="radio" name="v" checked>
      <span class="choice__text"><b class="choice__title">Versión actual (con datos)</b><span class="choice__desc">Guarda la contabilidad registrada actual.</span></span></label>
+   Checkbox: the same with <input type="checkbox">, in a .choice-group with a <legend>.
+   States: selected (accent border + tint) · default · hover (accent border) · disabled · focus (ring on the whole card)
 */
 .choice{display:flex;align-items:flex-start;gap:var(--space-12);padding:var(--space-12) var(--space-16);border:var(--border-thin) solid var(--line-strong);background:var(--surface);cursor:pointer;font-family:var(--font-sans);color:var(--text)}
 .choice input{width:var(--check-size);height:var(--check-size);margin:var(--space-2) 0 0;flex-shrink:0;accent-color:var(--field-accent, var(--primary));cursor:pointer}
@@ -681,6 +683,12 @@ h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;margin:0;padding:0;line-
 .choice__title{font-size:var(--text-16);font-weight:var(--weight-medium)}
 .choice__desc{font-size:var(--text-14);color:var(--text-muted)}
 .choice-group{display:flex;flex-direction:column;gap:var(--space-8);margin:0;padding:0;border:none}
+.choice:is(:hover,.is-hover):not(:has(input:disabled)){border-color:var(--field-accent, var(--primary))}
+.choice:has(input:disabled){border-color:var(--line);color:var(--disabled);cursor:not-allowed}
+.choice:has(input:disabled) :is(input,.choice__desc){color:var(--disabled);cursor:not-allowed}
+.choice input:focus-visible{outline:none}   /* the ring goes around the whole card */
+.choice:is(.is-focus,:has(input:focus-visible)){outline:var(--border-thick) solid var(--focus);outline-offset:var(--focus-offset);box-shadow:0 0 0 var(--border-thin) var(--black)}
+.choice:has(input:checked):is(.is-focus,:has(input:focus-visible)){box-shadow:inset 0 0 0 var(--border-thin) var(--field-accent, var(--primary)),0 0 0 var(--border-thin) var(--black)}
 
 /* ── Chip (static) ── */
 .chip{

@@ -4,7 +4,7 @@ import './showcase.css';
 import { version } from '../package.json';
 import { bigHTML, ghostHTML, iconButtonHTML, fabHTML } from '../components/button/button.stories.js';
 import { tabHTML, YearStrip } from '../components/tab/tab.stories.js';
-import { chipHTML, statusHTML, checkHTML, switchHTML } from '../components/selectors/selectors.stories.js';
+import { chipHTML, statusHTML, checkHTML, switchHTML, choiceHTML } from '../components/selectors/selectors.stories.js';
 import { kpiCardHTML } from '../components/card/card.stories.js';
 import { distributionHTML } from '../components/chart/chart.stories.js';
 import { showcaseTables } from '../components/table/table.stories.js';
@@ -29,7 +29,7 @@ const FOUNDATIONS = [
 const COMPONENTS = [
   ['button', 'Button', 'app-components-button--button', 'Big, ghost, icon and floating · their states'],
   ['tab', 'Tab', 'app-components-tab--tab', 'Navigation, period tabs, view toggle, year tab'],
-  ['selectors', 'Selectors', 'app-components-selectors--selectors', 'Checkbox & radio, status dot, switch / toggle, chips'],
+  ['selectors', 'Selectors', 'app-components-selectors--selectors', 'Checkbox & radio, choice card, status dot, switch / toggle, chips'],
   ['card', 'Card', 'app-components-card--card', 'The white block: KPI card and container card'],
   ['input', 'Input', 'app-components-input--input', 'Fields, select, description, small amounts (tax forms)'],
   ['table', 'Tables', 'app-components-tables--tables', 'Facturación, Gastos, Últimas facturas, Resumen anual, tax forms'],
@@ -106,6 +106,7 @@ const C = {
     ${row('Year tab', [slot('years')])}`,
   selectors: `
     ${row('Checkbox & radio', [checkHTML({ label: 'Aplicar retención IRPF del 15 %' }), checkHTML({ type: 'attention', label: 'Aplicar compensación', checked: false }), checkHTML({ type: 'attention', size: 'sm', label: 'Incluir en el 303' }), checkHTML({ kind: 'radio', label: 'Versión actual (con datos)', name: 'sc-r' }), checkHTML({ type: 'attention', label: 'Incluir en el 303', state: 'disabled', checked: false })])}
+    ${row('Choice card', [`<div class="sc__grid sc__grid--2 field--primary" style="flex:1">${choiceHTML({ name: 'sc-ch' })}${choiceHTML({ name: 'sc-ch', title: 'Versión vacía (sin datos)', desc: 'Para empezar desde cero.', checked: false })}${choiceHTML({ kind: 'checkbox', title: 'Versión actual (con datos)' })}${choiceHTML({ kind: 'checkbox', title: 'Versión vacía (sin datos)', desc: 'Para empezar desde cero.', checked: false })}</div>`])}
     ${row('Status dot', [statusHTML({ state: 'paid', mode: 'button' }), statusHTML({ state: 'pending', mode: 'button' }), statusHTML({ state: 'paid', mode: 'label' }), statusHTML({ state: 'pending', mode: 'label' })])}
     ${row('Switch / toggle', [switchHTML({}), switchHTML({ checked: true }), switchHTML({ showLabels: false })])}
     ${row('Chip (static)', [chipHTML({ label: 'Contabilidad' }), chipHTML({ label: 'Demo' }), chipHTML({ variant: 'code', label: 'c.01' }), chipHTML({ variant: 'code', label: 'c.28' })])}`,
