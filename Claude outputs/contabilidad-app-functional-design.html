@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QMEDGTSTV5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-QMEDGTSTV5');
+</script>
+<title>Functional Design — Contabilidad APP</title>
+<link rel="icon" href="./favicon-white.ico" sizes="48x48">
+<link rel="icon" href="./favicon-white.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./apple-touch-icon-white.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#F5F5F3;--surface:#FFFFFF;--ink:#111111;--ink2:#555550;--ink3:#8A8A82;
+  --blue:#0F62FE;--green-fill:#84FF00;--green-ink:#111111;--orange:#F66B21;
+  --border:rgba(17,17,17,0.10);--code-bg:#F0F0EC;--notice-bg:#E3E3DE;
+  --font-sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono','Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111110;--surface:#1B1B19;--ink:#F0F0EC;--ink2:#B8B8B0;--ink3:#82827A;
+    --blue:#6E9BFF;--green-fill:#84FF00;--orange:#FF9459;
+    --border:rgba(255,255,255,0.12);--code-bg:#232320;--notice-bg:#2B2B27;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111110;--surface:#1B1B19;--ink:#F0F0EC;--ink2:#B8B8B0;--ink3:#82827A;
+  --blue:#6E9BFF;--green-fill:#84FF00;--orange:#FF9459;
+  --border:rgba(255,255,255,0.12);--code-bg:#232320;--notice-bg:#2B2B27;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-sans);font-size:16px;line-height:1.6;padding:0 16px;margin:0}
+h1,h2,h3{text-wrap:balance;font-weight:600;font-family:var(--font-sans)}
+.wrap{max-width:760px;margin:0 auto}
+.topbar{position:sticky;top:0;background:var(--bg);padding-block:18px 12px;border-bottom:1px solid var(--border);z-index:10;margin-bottom:32px}
+.eyebrow{font-family:var(--font-sans);font-size:12px;font-weight:600;letter-spacing:0.02em;color:var(--ink3);margin-bottom:6px}
+.title{font-size:26px;font-weight:600;margin-bottom:14px}
+.jumpnav{display:flex;flex-wrap:wrap;gap:6px}
+.jumpnav a{font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--ink2);background:var(--code-bg);border:1px solid var(--border);padding:3px 10px;border-radius:3px;text-decoration:none;transition:background .12s,color .12s,border-color .12s}
+.jumpnav a:hover,.jumpnav a:focus-visible{background:var(--blue);border-color:var(--blue);color:#fff}
+section{margin-bottom:40px;scroll-margin-top:80px}
+.section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.section-head h2{font-size:19px;margin:0}
+.section-note{font-family:var(--font-sans);font-size:13.5px;color:var(--ink2);margin:-6px 0 16px}
+.subnav{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 18px}
+.subnav a{font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--ink2);background:var(--code-bg);border:1px solid var(--border);padding:2px 9px;border-radius:3px;text-decoration:none;transition:background .12s,color .12s,border-color .12s}
+.subnav a:hover,.subnav a:focus-visible{background:var(--blue);border-color:var(--blue);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:14px;scroll-margin-top:80px}
+.notice{background:var(--notice-bg);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:36px}
+.notice h3{font-size:13.5px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.03em}
+.notice p{font-size:14.5px;color:var(--ink2);margin:8px 0}
+.notice p:first-of-type{margin-top:0}
+.panel h3{font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;text-transform:uppercase;letter-spacing:0.03em}
+.panel h4{font-size:13.5px;margin:16px 0 6px;color:var(--ink)}
+.panel p{font-size:14.5px;color:var(--ink2);margin:8px 0}
+.panel p:first-of-type{margin-top:0}
+.badge{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;padding:2px 9px;border-radius:3px;white-space:nowrap}
+.badge.legal{background:#FFEB80;color:#111}
+.badge.product{background:var(--blue);color:#fff}
+.badge.deadcode{background:var(--code-bg);color:var(--ink2);border:1px solid var(--border)}
+.badge.quirk{background:#FFEB80;color:#111}
+.badge.new{background:var(--green-fill);color:#111}
+.badge.ok{background:var(--green-fill);color:#111}
+.badge.check{background:#FFEB80;color:#111}
+.badge.outdated{background:var(--orange);color:#fff}
+code,.mono{font-family:var(--font-mono);font-size:13.5px;font-weight:500}
+code{background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{background:var(--code-bg);border-radius:6px;padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;margin:10px 0}
+ul{margin:8px 0 8px 20px;padding:0;list-style:disc}
+li{font-size:14.5px;color:var(--ink2);margin-bottom:6px}
+li strong{color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+th{font-family:var(--font-sans);font-size:11.5px;font-weight:600;color:var(--ink3);text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--border);vertical-align:bottom}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top}
+td:first-child{color:var(--ink);font-weight:500}
+td a,p a,li a{color:var(--blue)}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 20px}
+.navtab{display:inline-flex;align-items:center;padding:3px 10px;font-family:var(--font-mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;border-radius:2px}
+.navtab.fill-green{background:var(--green-fill);color:#111}
+.navtab.fill-blue{background:var(--blue);color:#fff}
+.navtab.fill-orange{background:var(--orange);color:#fff}
+.navtab.outline-orange{background:transparent;border:1.5px solid var(--orange);color:var(--orange)}
+.navtab.outline-blue{background:transparent;border:1.5px solid var(--blue);color:var(--blue)}
+.navtab.inactive{background:var(--code-bg);color:var(--ink)}
+.chip{font-family:var(--font-mono);font-size:12px;font-weight:500;background:var(--code-bg);color:var(--ink2);padding:3px 9px;border-radius:3px}
+.chip code{font-family:var(--font-mono);font-weight:700;background:transparent;padding:0;color:var(--ink)}
+.table-scroll{overflow-x:auto}
+.footer-note{font-size:13px;color:var(--ink3);border-top:1px solid var(--border);padding-top:18px;margin-top:8px}
+@media (max-width:480px){.title{font-size:22px}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="eyebrow">Functional design · Nov 2026</div>
+    <div class="title">Contabilidad APP — functional design</div>
+    <nav class="jumpnav">
+      <a href="#scope">Purpose &amp; scope</a>
+      <a href="#layers">API layers</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#schema">Example schema</a>
+      <a href="#mapping">Demo mapping</a>
+      <a href="#flow">Usage flow</a>
+      <a href="#domain">Domain logic</a>
+      <a href="#hacienda">Hacienda rules · yearly check</a>
+      <a href="#hosted">Hosted API</a>
+    </nav>
+  </div>
+
+  <!-- ================= 1. PURPOSE & SCOPE ================= -->
+  <section id="scope">
+    <div class="section-head"><h2>1. Purpose &amp; scope</h2></div>
+
+    <div class="panel">
+      <h3>Audience</h3>
+      <p>Whoever builds the API — you, a hired freelancer, or a future team — plus anyone reviewing or approving the scope beforehand. No prior knowledge of this codebase is assumed.</p>
+      <p>It also serves as durable context for an AI coding agent asked to implement or modify the API later: since the app itself is a single HTML file with no separate spec, an agent working from the code alone would have to infer intent from function names and DOM logic. This document states that intent explicitly, so a change made months from now — by a person or an agent — stays consistent with the original design instead of drifting from it.</p>
+      <h3 style="margin-top:16px">What it's for</h3>
+      <p>A build-ready specification. It replaces the need to reverse-engineer requirements from the existing HTML/JS, so an implementer knows exactly which actions to build, what each one takes in and returns, and what's explicitly excluded — without having to ask. Kept alongside the codebase and updated whenever scope actually changes, it gives any future editor — human or AI agent — the same starting context it gives you now.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Two versions of the same app</h3>
+      <table>
+        <tr><th>Version</th><th>Data</th><th>What it adds</th></tr>
+        <tr><td><code>app_DEMO.html</code> (online)</td><td>Example data embedded in the file (<code>__appData</code>), kept in memory only: a reload brings the example back</td><td>Welcome dialog for visitors; nothing is saved</td></tr>
+        <tr><td><code>app_LOCAL.html</code> (on the user's computer)</td><td>The user's own data, written back into the same HTML file</td><td>File operations: Autorizar edición, Guardar cambios, Guardar copia .html, Exportar / Importar .json</td></tr>
+      </table>
+      <p>Both share the same screens, rules and calculations. Everything below applies to both unless a part is marked <em>Local only</em>. The local version is rebuilt from the demo, so the demo is the reference.</p>
+    </div>
+
+    <div class="panel">
+      <h3>In scope</h3>
+      <ul>
+        <li>Every capability currently reachable only through the UI — add/update/delete invoice, add/update/delete expense, mark an invoice paid/pending, manage years, save/open/import/export the ledger file — expressed as typed, callable operations.</li>
+        <li>The read/query surface: dashboard totals, quarterly and annual IVA/IRPF figures, invoice and expense lists.</li>
+        <li>Identity and permission rules for those operations.</li>
+        <li>Structured success/failure reporting back to the caller.</li>
+        <li>The tax rules the app applies, and which of them depend on Hacienda and must be checked every year (Section 8).</li>
+      </ul>
+      <h3 style="margin-top:16px">Out of scope</h3>
+      <ul>
+        <li>Any change to the visual interface — the existing screens keep working exactly as they do today; this API sits underneath them. The interface is built on the <strong>Mi Contabilidad Design System</strong> (Storybook + Figma library "Mi Contabilidad DS"), documented there.</li>
+        <li><strong>The two assistants</strong> — Acceso fácil and Asistente Inteligente. They read the same figures and use the same rules as the screens, but their design is covered separately.</li>
+        <li>Multi-user or multi-account support — the product is single-user, file-based, and this design reflects that as-is.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Why this matters</h3>
+      <p>The application currently stores all data inside the HTML file itself, with no server and no callable actions — everything happens through direct DOM manipulation in the browser. Defining a proper action and read API is the foundation for reliable, testable, and maintainable operation of the product, whatever triggers a given action.</p>
+    </div>
+  </section>
+
+  <div class="notice" id="terms-notice">
+    <h3>Terminology — English ↔ Spanish</h3>
+    <p>This document uses English terms for readability. Below is the mapping to the exact names shown in the app's own UI, so nothing gets lost in translation when cross-checking against the code or the screens.</p>
+    <table>
+      <tr><th>This document</th><th>Actual app label</th></tr>
+      <tr><td>Invoices screen</td><td>Facturación</td></tr>
+      <tr><td>Expenses screen</td><td>Gastos</td></tr>
+      <tr><td>VAT screen</td><td>IVA</td></tr>
+      <tr><td>Income tax screen</td><td>IRPF</td></tr>
+      <tr><td>Annual view</td><td>Resumen anual</td></tr>
+      <tr><td>Q1 / Q2 / Q3 / Q4</td><td>1T·Ene–Mar / 2T·Abr–Jun / 3T·Jul–Sep / 4T·Oct–Dic</td></tr>
+      <tr><td>Invoice / Expense</td><td>Factura / Gasto</td></tr>
+      <tr><td>National invoice / Tax-exempt invoice</td><td>Factura nacional (<code>esp</code>) / Factura exenta de impuestos (<code>ext</code>, foreign clients)</td></tr>
+      <tr><td>Paid / Pending</td><td>Cobrada / Pendiente</td></tr>
+    </table>
+  </div>
+
+  <!-- ================= 2. API LAYERS ================= -->
+  <section id="layers">
+    <div class="section-head"><h2>2. API layers overview</h2></div>
+    <p class="section-note">The API is organized into four functional layers.</p>
+
+    <div class="panel">
+      <table>
+        <tr><th>Layer</th><th>Role</th><th>Applied to this product</th></tr>
+        <tr><td>Action API</td><td>Exposes each user capability as a discrete, callable operation with typed parameters</td><td><code>create_invoice</code>, <code>update_invoice</code>, <code>delete_invoice</code>, <code>set_invoice_paid</code>, <code>create_expense</code>, <code>update_expense</code>, <code>delete_expense</code>, <code>add_year</code>, <code>delete_year</code></td></tr>
+        <tr><td>Search / Retrieval API</td><td>Queries app state in a form a caller can consume directly</td><td>Dashboard totals, invoice/expense lists filtered by year or quarter, IVA/IRPF quarterly and annual figures</td></tr>
+        <tr><td>Identity &amp; Permissions API</td><td>Confirms who is calling and what they're allowed to do</td><td>Ties every action to the authorized ledger file/session; blocks actions the caller isn't allowed to run</td></tr>
+        <tr><td>Notification / State-Change API</td><td>Reports events back to the caller in real time</td><td>Confirms a save succeeded, a record was deleted (with undo), a date looks wrong, or an operation failed — replacing today's toasts, warnings and <code>alert()</code> popups</td></tr>
+      </table>
+      <p>Design rules that apply across all four layers: actions must be atomic and composable, permission checks must live server-side (not only in UI logic), every action returns a structured success/failure result, and every state-changing action is logged consistently regardless of what triggered it.</p>
+    </div>
+  </section>
+
+  <!-- ================= 3. REQUIREMENTS ================= -->
+  <section id="requirements">
+    <div class="section-head"><h2>3. Functional requirements per layer</h2></div>
+
+    <div class="panel">
+      <h3>Action API</h3>
+      <ul>
+        <li>Every capability currently triggered by <code>addFact()</code>, <code>updateFact()</code>, <code>deleteFact()</code>, <code>toggleCobrada()</code>, <code>addGasto()</code>, <code>addGastoIva()</code>, <code>updateGasto()</code>, <code>deleteGasto()</code>, the mobile forms (<code>mSaveInv()</code>, <code>mSaveGasto()</code>), <code>addYear()</code> or <code>deleteYearConfirm()</code> must have a corresponding action with a name, a typed parameter list, and a defined return shape.</li>
+        <li>Actions must validate input server-side rather than relying on the browser form to catch it — including the date rules in Section 7 (format, year, quarter).</li>
+        <li>Actions must be idempotent-safe where the current UI already assumes it.</li>
+        <li>Deletions must be reversible for a short time, as the "Deshacer" toast allows today (a <code>restore_*</code> action or a soft delete).</li>
+        <li>Every action returns <code>status</code> (success / error), a machine-readable <code>code</code> on error, and a short human-readable <code>message</code>.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Search / Retrieval API</h3>
+      <ul>
+        <li>Must support the same filters the UI already offers: by year, by quarter (or the whole year), by invoice status (paid/pending), and expenses grouped by IRPF category or by IVA rate.</li>
+        <li>Must return the same computed totals the screens show today, rather than raw rows the caller has to recompute.</li>
+        <li>Must support a single-item lookup by ID in addition to list queries.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Identity &amp; Permissions API</h3>
+      <ul>
+        <li>Confirms that a request is operating on the authorized, currently-open ledger.</li>
+        <li>Must reject any action targeting a year or record that isn't part of the currently loaded file.</li>
+        <li>Must reject writes to read-only views: the Resumen anual of Facturación and Gastos can't add or delete records.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Notification / State-Change API</h3>
+      <ul>
+        <li>Must replace today's feedback (toasts, the Atención! date warning and the remaining <code>alert()</code>/<code>confirm()</code>/<code>prompt()</code> calls) with structured events any caller can render its own way.</li>
+        <li>Must expose a "dirty state" flag equivalent to the local version's <code>markChanged()</code> / <code>markSaved()</code> logic, so a caller always knows if there are unsaved changes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 4. EXAMPLE SCHEMA ================= -->
+  <section id="schema">
+    <div class="section-head"><h2>4. Example action schema</h2></div>
+
+    <div class="panel">
+      <p>The demo's <code>addFact(type)</code> / <code>updateFact(id, field, value)</code> / <code>deleteFact(id)</code> functions and the mobile form <code>mSaveInv()</code> map to one action family. Below is <code>create_invoice</code>, using the field names of the app's own data model — any caller, a script, an internal tool, or another integration, uses this shape.</p>
+      <pre>{
+  "name": "create_invoice",
+  "description": "Creates a new invoice (factura) in the currently open ledger year.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "type":     { "type": "string", "enum": ["esp", "ext"], "description": "esp = nacional (IVA + optional retention) · ext = exenta (foreign client)" },
+      "num":      { "type": "string", "description": "Invoice number" },
+      "fecha":    { "type": "string", "pattern": "^\\d{2}/\\d{2}/\\d{4}$", "description": "DD/MM/AAAA, in the open year" },
+      "quarter":  { "type": "integer", "enum": [1, 2, 3, 4], "description": "Quarter it is declared in (trim). Defaults to the quarter of fecha" },
+      "cliente":  { "type": "string" },
+      "concepto": { "type": "string" },
+      "base":     { "type": "number", "description": "Base imponible, net amount before IVA" },
+      "iva":      { "type": "number", "enum": [0, 4, 10, 21], "description": "Only for esp. Allowed rates per year: see Section 8" },
+      "ret":      { "type": "boolean", "default": true, "description": "Only for esp: apply the IRPF retention (15 %)" },
+      "cobrada":  { "type": "boolean", "default": false }
+    },
+    "required": ["type", "num", "fecha", "cliente", "concepto", "base"]
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "status":     { "type": "string", "enum": ["success", "error"] },
+      "invoice_id": { "type": "string" },
+      "warnings":   { "type": "array", "items": { "type": "string" }, "description": "e.g. date_outside_quarter" },
+      "code":       { "type": "string" },
+      "message":    { "type": "string" }
+    }
+  }
+}</pre>
+      <p>The corresponding read action, <code>get_dashboard_summary</code>, would return the same totals <code>renderDashboard()</code> computes today — as structured data instead of rendered HTML.</p>
+    </div>
+  </section>
+
+  <!-- ================= 5. DEMO MAPPING ================= -->
+  <section id="mapping">
+    <div class="section-head"><h2>5. Demo app mapping</h2></div>
+    <p class="section-note">Mapping from the app's current in-browser functions to the API actions this design proposes.</p>
+
+    <div class="panel">
+      <div class="table-scroll"><table>
+        <tr><th>Screen</th><th>Current function(s)</th><th>Proposed API action</th></tr>
+        <tr><td>Facturación</td><td><code>addFact()</code>, <code>updateFact()</code>, <code>deleteFact()</code>, <code>toggleCobrada()</code>; mobile: <code>mOpenInv()</code> + <code>mSaveInv()</code></td><td><code>create_invoice</code>, <code>update_invoice</code>, <code>delete_invoice</code>, <code>set_invoice_paid</code></td></tr>
+        <tr><td>Facturación · Cálculo del salario</td><td><code>saveSalarioClientes()</code></td><td><code>set_salary_clients</code></td></tr>
+        <tr><td>Gastos</td><td><code>addGasto()</code>, <code>addGastoIva()</code>, <code>addIvaRate()</code>, <code>updateGasto()</code>, <code>deleteGasto()</code>; mobile: <code>mOpenGasto()</code> + <code>mSaveGasto()</code></td><td><code>create_expense</code>, <code>update_expense</code>, <code>delete_expense</code></td></tr>
+        <tr><td>IVA</td><td><code>renderIva()</code>, <code>renderIvaAnual()</code>, <code>saveIvaNota()</code>, <code>saveIvaPagado()</code>, compensation checkbox and amount</td><td><code>get_iva_summary</code>, <code>set_iva_note</code>, <code>set_iva_paid</code>, <code>set_iva_compensation</code></td></tr>
+        <tr><td>IRPF</td><td><code>renderIrpf()</code>, <code>renderIrpfAnual()</code>, <code>saveIrpfNota()</code>, <code>saveIrpfPagado()</code></td><td><code>get_irpf_summary</code>, <code>set_irpf_note</code>, <code>set_irpf_paid</code></td></tr>
+        <tr><td>Dashboard</td><td><code>renderDashboard()</code></td><td><code>get_dashboard_summary</code></td></tr>
+        <tr><td>Year management</td><td><code>addYear()</code>, <code>deleteYearConfirm()</code>, <code>setYear()</code></td><td><code>add_year</code>, <code>delete_year</code>, <code>list_years</code></td></tr>
+        <tr><td>File operations <em>(Local only)</em></td><td><code>abrirArchivo()</code>, <code>guardarEnArchivo()</code>, <code>guardarJSON()</code>, <code>importarDatos()</code></td><td><code>save_ledger</code>, <code>export_ledger_backup</code>, <code>import_ledger_data</code></td></tr>
+      </table></div>
+      <p><strong>Amortization</strong> has no screen or actions of its own: depreciable assets are entered as normal expenses in category 10, <em>Otros desgravables</em>, with the type written in the <strong>Objeto</strong> column (e.g. "Bienes amortizables"). No amortization actions are needed.</p>
+      <p>The app has no backend at all — the demo reads and writes the <code>__appData</code> JSON embedded in the HTML file, and the local version also rewrites that JSON into the file on save. Every function above needs to move behind the typed action interface before any external caller can use it.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Data model (<code>__appData</code>)</h3>
+      <p>One object per year, <code>yr_2026</code>, plus <code>_years</code> (the list of years). The .json backup of the local version uses the same content under <code>cb_2026</code> / <code>years</code>.</p>
+      <div class="table-scroll"><table>
+        <tr><th>Field</th><th>Content</th></tr>
+        <tr><td><code>facturas[]</code></td><td><code>id</code>, <code>type</code> (esp / ext), <code>num</code>, <code>fecha</code> (DD/MM/AAAA), <code>cliente</code>, <code>concepto</code>, <code>base</code>, <code>iva</code> (%), <code>ret</code> (bool), <code>cobrada</code> (bool), <code>trim</code> (1–4)</td></tr>
+        <tr><td><code>gastos[]</code></td><td><code>id</code>, <code>cat</code> (one of the 10 IRPF categories), <code>num</code>, <code>fecha</code>, <code>proveedor</code>, <code>concepto</code>, <code>base</code>, <code>iva</code> (%), <code>en303</code> (bool), <code>trim</code>, <code>objeto</code> (category 10 only)</td></tr>
+        <tr><td><code>iva_notes[4]</code>, <code>irpf_notes[4]</code></td><td>Notes per quarter</td></tr>
+        <tr><td><code>iva_anual_nota</code>, <code>irpf_anual_nota</code></td><td>Notes of the Resumen anual</td></tr>
+        <tr><td><code>iva_pagado[4]</code>, <code>irpf_pagado[4]</code></td><td>Amount actually paid per quarter (IRPF: used as "pagos anteriores")</td></tr>
+        <tr><td><code>iva_compensar_on[4]</code>, <code>iva_compensar_amt[4]</code></td><td>"Aplicar compensación" checkbox and amount per quarter</td></tr>
+        <tr><td><code>salario_clientes</code></td><td>Client(s) used for the salary estimate: names joined with <code>+</code>, or <code>Todas</code></td></tr>
+      </table></div>
+      <p><span class="badge quirk">non-obvious rule</span> <code>trim</code> is stored, not derived: an invoice or expense is declared in the quarter it was saved in, which can differ from the quarter of its date (the app only warns — see Date rules).</p>
+    </div>
+  </section>
+
+  <!-- ================= 6. USAGE FLOW ================= -->
+  <section id="flow">
+    <div class="section-head"><h2>6. End-to-end usage flow</h2></div>
+
+    <div class="panel">
+      <p>Example: a caller records a new invoice as "paid." This shows how the four layers from Section 2 work together for a real action.</p>
+      <pre class="mermaid">sequenceDiagram
+  participant Caller
+  participant IdentityAPI as Identity &amp; Permissions API
+  participant ActionAPI as Action API
+  participant StateAPI as Notification / State-Change API
+
+  Caller->>IdentityAPI: Confirm caller is authorized on this ledger
+  IdentityAPI-->>Caller: Authorized
+  Caller->>ActionAPI: set_invoice_paid(invoice_id, true)
+  ActionAPI->>ActionAPI: Validate invoice exists and belongs to loaded ledger
+  ActionAPI-->>StateAPI: Emit state-change event
+  StateAPI-->>Caller: status: success, dirty_state: true</pre>
+      <p>This flow works identically for any caller — a script, an internal tool, or a test harness — because the API layers don't change based on who is calling them.</p>
+    </div>
+  </section>
+
+  <!-- ================= 7. DOMAIN & CALCULATION LOGIC ================= -->
+  <section id="domain">
+    <div class="section-head"><h2>7. Domain &amp; calculation logic (tax rules)</h2></div>
+    <p class="section-note">Organized the way the app itself is laid out — top to bottom, screen by screen — so it reads alongside the UI. The values that depend on Hacienda are collected again in Section 8, for the yearly check.</p>
+    <nav class="subnav">
+      <a href="#d-header">Header</a>
+      <a href="#d-alerts">Alerts</a>
+      <a href="#d-dates">Date rules</a>
+      <a href="#d-nav">Navigation</a>
+      <a href="#d-dash">Dashboard</a>
+      <a href="#d-fact">Facturación</a>
+      <a href="#d-gastos">Gastos</a>
+      <a href="#d-iva">IVA</a>
+      <a href="#d-irpf">IRPF</a>
+      <a href="#d-mobile">Mobile</a>
+    </nav>
+
+    <div class="panel" id="d-header">
+      <h3>Header</h3>
+      <p><strong>User info area.</strong> Account name and a "DEMO" badge, plus an info icon. In the demo its tooltip presents the app: it organizes the accounting of autónomos in Spain, visitors can try it by adding invoices or expenses, and the assistants are examples of what AI collaboration can do. In the local version it is the onboarding text: the app runs entirely locally; to start editing, click "Autorizar edición," pick the saved copy of the HTML file, and every change is written back into that same file; a JSON backup is recommended.</p>
+      <h4>File buttons <em>(Local only)</em></h4>
+      <ul>
+        <li><strong>"Guardar copia .html"</strong> — opens a dialog offering the current version with data, or a blank version to start fresh.</li>
+        <li><strong>"Exportar .json"</strong> — downloads the full data set as JSON.</li>
+        <li><strong>"Importar .json"</strong> — a hidden file input; selecting a file replaces the working data.</li>
+        <li><strong>"Autorizar edición"</strong> — opens the instructions dialog (Spanish only): select the previously-downloaded .html file, and keep a .json backup. "Continuar" opens the browser's file picker (File System Access API); "Cancelar" or Escape closes it with nothing granted.</li>
+        <li><strong>"✓ Guardado" / "Guardar cambios"</strong> — writes changes back; turns orange while there are unsaved changes.</li>
+      </ul>
+      <h4>Year strip <span class="badge quirk">special logic</span></h4>
+      <p>Always 6 year slots, starting at the first year with data. Once the current year would fall outside them, the strip moves forward (the oldest year leaves), so the current year is always visible. States: <strong>active</strong> (selected), <strong>has data</strong>, <strong>future</strong> (disabled), or empty. On mobile only years that can be opened are shown. Clicking a year calls <code>setYear(yr)</code>.</p>
+      <p><span class="badge deadcode">dead code</span>&nbsp; <code>addYear()</code>, <code>deleteYearConfirm()</code> and <code>pedirAnoInicial()</code> exist in the code but aren't wired to any button. There is currently <strong>no way to add or delete a year through the UI</strong> — the strip only switches between years that already exist in the file. If rebuilt, this is a real gap to close deliberately.</p>
+    </div>
+
+    <div class="panel" id="d-alerts">
+      <h3>Alerts &amp; dialogues</h3>
+      <p>A cross-cutting pattern — these surface from more than one screen. All the custom ones are built with the design system's Dialog and Toast.</p>
+      <h4>Custom dialogs and feedback</h4>
+      <ul>
+        <li><strong>Welcome dialog</strong> (on page load) — bilingual (ES default, EN switch), explains the app. Demo: invites visitors to try it and gives the contact email. Local: notes the app reflects "the rules in force at the time," footnoted (*) to a disclaimer — a portfolio demo, not a certified product; using it for real accounting is at the user's own risk. "Continuar" or Escape closes it. Full screen on mobile.</li>
+        <li><strong>Atención!</strong> — the date warning (see Date rules). A small dialog with "Entendido"; it opens over everything, including the mobile forms.</li>
+        <li><strong>Toast with "Deshacer"</strong> — after deleting an invoice or expense ("Factura 411 eliminada. Deshacer"), and after saving from a mobile form ("Factura F-099 guardada en el 3T 2026 como pendiente de cobro.").</li>
+        <li><strong>Info tooltips (ⓘ)</strong> — every section and card with rules has one; they open on hover, focus or tap, and align to the button's side of the screen.</li>
+        <li><strong>Instructions dialog</strong> and <strong>"Guardar copia .html" dialog</strong> <em>(Local only)</em> — see Header.</li>
+      </ul>
+      <h4>Native browser dialogues — <code>alert()</code>/<code>confirm()</code>/<code>prompt()</code>, no custom UI</h4>
+      <ul>
+        <li><strong>Custom IVA rate</strong> (Gastos · Por % IVA) — "Introduce el % de IVA que quieres añadir" goes through a raw prompt. The new expense is created in category 8, <em>Otros consumos de explotación</em>: change the category afterwards if it's something else.</li>
+        <li><strong>Delete-year confirmation</strong> and <strong>first-year prompt</strong> (dead code) — would name exactly how many invoices/expenses will be lost, if ever wired to a button.</li>
+        <li><em>Local only:</em> browser support check ("Tu navegador no soporta esta función. Usa Chrome 86+."), save-before-authorize guard, save/parse failures ("Error: marcador no encontrado."), import results ("Formato no reconocido." / "✓ Datos importados. Guarda el archivo para conservarlos."), and the unsaved-changes prompt when closing the page.</li>
+      </ul>
+      <p>The native ones are blocking and unstyled. A rebuilt/API-backed version should route them through the Notification/State-Change API instead, so a caller can render its own non-blocking UI; the custom dialogs above are already the right shape.</p>
+    </div>
+
+    <div class="panel" id="d-dates">
+      <h3>Date rules</h3>
+      <p>The same rules in every form (desktop tables, mobile forms):</p>
+      <ul>
+        <li><strong>Format DD/MM/AAAA.</strong> Typed dates are normalized (1/9 → 01/09/2026). Phones and tablets use the native date picker instead.</li>
+        <li><strong>The year is always the year selected in the strip.</strong> Typing 2025 or 2027 while 2026 is open gives 2026.</li>
+        <li><strong>An impossible day moves to the last day of the month</strong> (31/06 → 30/06).</li>
+        <li><strong>Date outside the quarter → Atención!</strong> "Revise que el trimestre seleccionado es el correcto ya que la fecha … no coincide." It's a warning, not a block: the record stays in the chosen quarter (<code>trim</code>).
+          <ul>
+            <li>Desktop: shown after editing the date in the table (the record is already saved).</li>
+            <li>Mobile forms: shown <strong>before</strong> saving; the form stays open to correct the date or the quarter. Guardar again with no change saves.</li>
+          </ul>
+        </li>
+        <li>Two more messages exist for dates that can't be read: wrong format, and a day that doesn't exist.</li>
+      </ul>
+    </div>
+
+    <div class="panel" id="d-nav">
+      <h3>Navigation</h3>
+      <div class="chip-row">
+        <span class="navtab fill-green">Dashboard</span>
+        <span class="navtab fill-blue">Facturación</span>
+        <span class="navtab fill-orange">Gastos</span>
+        <span class="navtab outline-orange">IVA</span>
+        <span class="navtab outline-blue">IRPF</span>
+      </div>
+      <p>Desktop: a fixed sidebar on the left. Mobile: a section menu (dropdown) in the header, in the colour of the current section. Both call <code>goTo(sectionId)</code> — the app's single routing function — which swaps the visible section, updates the active highlight, and re-renders from <code>__appData</code>.</p>
+      <p>Inside each section, a <strong>period selector</strong>: tabs on desktop (Resumen anual · 1T · 2T · 3T · 4T), a dropdown on mobile.</p>
+      <p><strong>Mapping to the API:</strong> today each section re-renders directly from local state. Once the Section 3 layers exist, each section should call its read action on entry instead — Dashboard → <code>get_dashboard_summary</code>, Facturación → an invoice-list read — and every button inside should call the matching action instead of mutating <code>__appData</code> in place.</p>
+    </div>
+
+    <div class="panel" id="d-dash">
+      <h3>Dashboard</h3>
+      <p>Header date: today for the current year, 31 Dec for past years.</p>
+      <ul>
+        <li><strong>"Salario neto del mes."</strong> An estimate for the current month: the base of the previous month's invoices from the configured client(s) (Facturación · Cálculo del salario), minus the base of <em>all</em> the previous month's expenses. Independent of whether invoices are paid. January uses December of the previous year. Past years show December. Served by <code>getSalarioMainClientMonthly()</code>.</li>
+        <li><strong>"Previsión de ahorro mensual."</strong> 12% of the salary figure above, floored at 0.</li>
+        <li><strong>"IVA a pagar" / "IRPF a pagar" cards.</strong> Clickable (open the section). They always show the first quarter whose deadline hasn't passed, in three states: quarter in progress ("en curso · Previsión", or "Sin actividad" for IVA), filing window open ("vence 20 de octubre"), year closed ("Año 2026 cerrado", after 30 Jan). Same formulas as the IVA and IRPF screens; IVA shows 0 when the result is negative.</li>
+        <li><strong>"Comparativa Ingresos · Gastos"</strong> line chart — month by month, <em>paid</em> invoices only against all expenses (base).</li>
+        <li><strong>"Comparativa salario neto"</strong> bar chart — the monthly salary estimate of this year against the previous year.</li>
+        <li>Both charts have <strong>"Ver datos en tabla"</strong>, the same figures as a table (accessibility).</li>
+        <li><strong>"Distribución del gasto"</strong> — the whole year, all 10 categories (even at 0%), largest first, as % of total expenses (base).</li>
+        <li><strong>"Últimas facturas"</strong> — the 6 most recent invoices by date; the paid/pending dot is clickable. Its ⓘ explains that the dot toggles the status and updates every total and chart.</li>
+      </ul>
+    </div>
+
+    <div class="panel" id="d-fact">
+      <h3>Facturación</h3>
+      <p>Periods: Resumen anual (read-only: no adding or deleting) · 1T–4T.</p>
+      <h4>Insights on top</h4>
+      <ul>
+        <li><strong>Total facturado</strong> — base amount, national + foreign, for the period in view.</li>
+        <li><strong>Cobrado</strong> — base amount of paid invoices, period in view.</li>
+        <li><strong>Pendiente de cobro</strong> <span class="badge quirk">non-obvious rule</span> — accumulates every unpaid invoice from 1T through the selected quarter, <em>plus every unpaid invoice from every previous year.</em> A running "money owed to me" figure, not a quarter snapshot.</li>
+        <li><strong>IRPF retenido</strong> — sum of the 15% retentions withheld, period in view.</li>
+      </ul>
+      <h4>Two tables: Facturas nacionales · Facturas exentas de impuestos</h4>
+      <table>
+        <tr><th>Type</th><th>IVA</th><th>Retention</th><th>Total</th></tr>
+        <tr><td>esp (nacional)</td><td>0/4/5/10/21% (default 21%)</td><td>Optional, flat 15% (on by default)</td><td>base + IVA − retention</td></tr>
+        <tr><td>ext (exenta, foreign client)</td><td>None</td><td>None</td><td>base</td></tr>
+      </table>
+      <ul>
+        <li>Under each table: <strong>Total (neto)</strong>. Under both: the grand total and the Cobrada/Pendiente legend.</li>
+        <li><strong>Pendiente/Cobrada dot</strong> flips the status instantly and feeds the Dashboard and the Pendiente de cobro card. Every new invoice starts as Pendiente.</li>
+        <li><strong>"Cálculo del salario"</strong> — the client(s) that drive the salary estimate, stored per year: several names joined with <code>+</code>, or <code>Todas</code> for all invoices. Its explanation is in the ⓘ next to the title.</li>
+      </ul>
+    </div>
+
+    <div class="panel" id="d-gastos">
+      <h3>Gastos</h3>
+      <h4>Insights on top</h4>
+      <ul>
+        <li><strong>Total gastos</strong> — base amount, all expenses in view.</li>
+        <li><strong>IVA soportado</strong> — total IVA, regardless of 303 status.</li>
+        <li><strong>IVA incluido 303</strong> — only expenses checked for the quarterly return (in Resumen anual: the whole year).</li>
+        <li><strong>Total gastado</strong> — base + IVA.</li>
+      </ul>
+      <h4>The 10 IRPF categories</h4>
+      <p>Numbered 1–10 everywhere except the dashboard chart. Each has an ⓘ with its rule (text only — see below).</p>
+      <div class="chip-row">
+        <span class="chip"><code>1 reta</code> Seguridad Social / RETA</span>
+        <span class="chip"><code>2 arr</code> Arrendamientos y cánones</span>
+        <span class="chip"><code>3 sum</code> Suministros (30% cap)</span>
+        <span class="chip"><code>4 osum</code> Otros suministros</span>
+        <span class="chip"><code>5 serv</code> Otros servicios exteriores</span>
+        <span class="chip"><code>6 trans</code> Transporte y viajes</span>
+        <span class="chip"><code>7 mant</code> Manutención (26,67 € / 48,08 € día)</span>
+        <span class="chip"><code>8 otros</code> Otros consumos de explotación</span>
+        <span class="chip"><code>9 oduc</code> Otros gastos deducibles (5% / 2.000 €)</span>
+        <span class="chip"><code>10 odeg</code> Otros desgravables (+ Objeto column)</span>
+      </div>
+      <h4>Two views, same data</h4>
+      <p>Expenses can be grouped by IRPF category ("Por cat. IRPF") or by IVA rate ("Por % IVA"). The expenses themselves don't change, only how they're grouped. Adding from a category opens the form with that category; adding from a rate opens it with that rate (in category 8).</p>
+      <div class="chip-row">
+        <span class="navtab fill-orange">Por cat. IRPF</span>
+        <span class="navtab inactive">Por % IVA</span>
+      </div>
+      <ul>
+        <li><span class="badge legal">informative only</span> The caps and rates in the category tooltips (30% suministros, manutención limits, 5%/2.000 € difícil justificación, 25% amortización…) are reference text only — the app doesn't calculate or enforce any of them. They are listed in Section 8 for the yearly check.</li>
+        <li><strong>Seguridad Social / RETA never carries IVA</strong> <span class="badge quirk">enforced</span>: choosing it sets IVA to 0% (locked, with the hint "La cuota de autónomos no lleva IVA.") and turns the 303 checkbox off. The data is also corrected on save (<code>fixRetaIva()</code>).</li>
+      </ul>
+      <h4>The 303 checkbox</h4>
+      <ul>
+        <li><strong>Disabled</strong> — IVA rate is 0%, or category 1 (RETA).</li>
+        <li><strong>Enabled</strong> — otherwise; on by default for new expenses with IVA.</li>
+        <li>When the quarter has no national invoices, the IVA screen shows a warning (see IVA) — the checkbox still works.</li>
+      </ul>
+    </div>
+
+    <div class="panel" id="d-iva">
+      <h3>IVA (Modelo 303 · 390)</h3>
+      <p>Deadlines: <strong>20 Apr · 20 Jul · 20 Oct · 30 Jan (year+1).</strong> A quarter that hasn't started shows "—".</p>
+      <table>
+        <tr><th>Box</th><th>Meaning</th><th>Formula (that quarter)</th></tr>
+        <tr><td>c.01</td><td>Base imponible</td><td>Σ base of esp invoices</td></tr>
+        <tr><td>c.03</td><td>IVA repercutido</td><td>Σ base × iva% (esp invoices)</td></tr>
+        <tr><td>c.28</td><td>Base gastos deducibles</td><td>Σ base of expenses with 303 on (IVA &gt; 0, not RETA)</td></tr>
+        <tr><td>c.29</td><td>IVA soportado</td><td>Σ base × iva% (same expenses)</td></tr>
+        <tr><td>c.120</td><td>Operaciones no sujetas</td><td>Σ base of ext invoices</td></tr>
+      </table>
+      <p><strong>Result:</strong> subtotal = c.03 − c.29; resultado = subtotal − compensar (if "Aplicar compensación" is on — the amount is typed by the user, not carried over automatically). Positive → "A ingresar este trimestre" and the "IVA pagado" field appears; negative → "A compensar próximo trimestre"; zero → "Sin actividad con IVA."</p>
+      <p><span class="badge quirk">inconsistency</span> With no national invoices in the quarter, a banner says "Sin facturación española → IVA soportado no deducible este trimestre," but the calculation still deducts it. See Section 8.</p>
+      <p><strong>Resumen anual (Modelo 390):</strong> the five figures per quarter; a quarter whose deadline hasn't passed shows "Sin resultado hasta que termine el plazo de declaración". Total: "Resultado anual → Mod. 390". Notes per quarter and for the year.</p>
+    </div>
+
+    <div class="panel" id="d-irpf">
+      <h3>IRPF (Modelo 130 · 100)</h3>
+      <p>Same deadlines as IVA. Figures are <strong>cumulative from 1T</strong>, not quarter-only. On top, one card per quarter with the cumulative amount paid.</p>
+      <p><span class="badge quirk">labeling quirk</span> The 1T card reads "IRPF abonado (1T)" while 2T–4T read "IRPF acumulado" — every card actually shows the same thing (cumulative paid through that quarter). Worth resolving, not carrying over, if rebuilt.</p>
+      <table>
+        <tr><th>Box</th><th>Meaning</th><th>Formula (cumulative)</th></tr>
+        <tr><td>c.01</td><td>Ingresos íntegros</td><td>Σ base, all invoices, 1T→now</td></tr>
+        <tr><td>c.02</td><td>Gastos deducibles</td><td>Σ base, all expenses, 1T→now</td></tr>
+        <tr><td>c.03</td><td>Rendimiento neto</td><td>c.01 − c.02</td></tr>
+        <tr><td>c.05</td><td>20% s/ rendimiento</td><td>c.03 × 20%</td></tr>
+        <tr><td>c.07</td><td>Retenciones</td><td>Σ base × 15% (invoices with retention)</td></tr>
+        <tr><td>c.08</td><td>Pagos anteriores</td><td>Σ "IRPF pagado" of the previous quarters</td></tr>
+      </table>
+      <p><strong>Result:</strong> cuota = max(0, c.05 − c.07 − c.08) → "A ingresar este trimestre" or "Sin pago fraccionado este trimestre". Already floored — no negative state, unlike IVA. <strong>Resumen anual:</strong> "Pagado a cuenta → Mod. 100".</p>
+    </div>
+
+    <div class="panel" id="d-mobile">
+      <h3>Mobile (screens up to 1023px)</h3>
+      <p>Same data and rules; only the way of working changes. On desktop you type straight into the tables; on mobile you add and review through full-screen dialogs.</p>
+      <ul>
+        <li><strong>Dashboard</strong> — one column: Comparativa Ingresos · Gastos, Últimas facturas, then the salary, savings, IVA and IRPF cards. The salary bar chart and Distribución del gasto aren't shown (Distribución appears in mobile Gastos).</li>
+        <li><strong>Facturación / Gastos</strong> — the period dropdown, summary cards with "Añadir factura / gasto", and "Ver todas las facturas / todos los gastos", which opens the list: one card per table or category, each invoice or expense as a record (Gastos keeps the Por cat. IRPF / Por % IVA toggle), grand totals at the end. Delete with the bin, undo with the toast.</li>
+        <li><strong>Nueva factura / Nuevo gasto</strong> — full-screen forms. On top, a <strong>quarter dropdown</strong>: the quarter the record is saved in, starting on the quarter on screen; opened from Resumen anual it follows the date. A live total: <strong>Total factura</strong> = base + IVA − 15% retention (exenta: the base), <strong>Total gasto</strong> = base + IVA. Required fields show their error under the field. After saving, the list behind switches to the chosen quarter.</li>
+        <li><strong>IVA / IRPF</strong> — the quarterly forms as on desktop; the Resumen anual becomes one block per quarter.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 8. HACIENDA RULES ================= -->
+  <section id="hacienda">
+    <div class="section-head"><h2>8. Rules that depend on Hacienda — check every year</h2></div>
+    <p class="section-note">Every figure below comes from tax or Social Security rules and is written into the app's code or texts. Each January (before the 4T returns, due 30 Jan), check them against the official sources and update the app if anything changed. Status as checked in <strong>November 2026</strong>.</p>
+
+    <div class="panel">
+      <p><span class="badge ok">ok</span> matches the 2026 reference &nbsp; <span class="badge check">check</span> to review, partly covered or not confirmed</p>
+      <p style="font-size:13px">This list is a maintenance aid, not tax advice. When in doubt, confirm with a gestoría or the Agencia Tributaria.</p>
+    </div>
+
+    <div class="panel">
+      <h3>IVA</h3>
+      <div class="table-scroll"><table>
+        <tr><th>Rule</th><th>In the app</th><th>2026 reference</th><th>Status</th></tr>
+        <tr><td>IVA rates</td><td>0 · 4 · 5 · 10 · 21% in every IVA list (<code>IVA_RATES</code>, mobile forms)</td><td>General 21%, reduced 10% and 4%, and 0%. The 5% was a temporary rate (energy measures after the war in Ukraine) and is no longer in force: keep it only for past years that used it</td><td><span class="badge check">check</span><br>5% for past years only</td></tr>
+        <tr><td>Deadlines 303</td><td>20 Apr · 20 Jul · 20 Oct · 30 Jan (<code>TRIM_DEADLINES</code>, dashboard cards)</td><td>1–20 Apr, Jul, Oct; 4T 1–30 Jan</td><td><span class="badge ok">ok</span></td></tr>
+        <tr><td>Modelo 390 (annual)</td><td>Resumen anual "→ Mod. 390"</td><td>1–30 Jan of the following year</td><td><span class="badge ok">ok</span></td></tr>
+        <tr><td>Box numbers of the 303</td><td>c.01, c.03, c.28, c.29, c.120</td><td>Fixed by the yearly Orden that approves the form</td><td><span class="badge check">check</span></td></tr>
+        <tr><td>Foreign (ext) invoices</td><td>No IVA, no retention, reported in c.120</td><td>Services to foreign clients located outside Spain; for EU business clients, Modelo 349 may also apply (not covered by the app)</td><td><span class="badge check">check</span></td></tr>
+        <tr><td>IVA soportado without national invoices</td><td>Banner says "no deducible" but the 303 still deducts it</td><td>Confirm which applies to costs linked to foreign services</td><td><span class="badge check">check</span><br>inconsistent</td></tr>
+        <tr><td>RETA and IVA</td><td>RETA never carries IVA, never in the 303</td><td>Social Security fees carry no IVA</td><td><span class="badge ok">ok</span></td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel">
+      <h3>IRPF</h3>
+      <div class="table-scroll"><table>
+        <tr><th>Rule</th><th>In the app</th><th>2026 reference</th><th>Status</th></tr>
+        <tr><td>Retention on invoices</td><td>Flat 15% (invoice total, c.07, IRPF retenido, Total factura)</td><td>15% general. 7% for new autónomos: the year of alta and the two following, under conditions</td><td><span class="badge check">check</span><br>7% not supported</td></tr>
+        <tr><td>Modelo 130 rate</td><td>20% of the cumulative net income, minus retentions and previous payments</td><td>Same</td><td><span class="badge ok">ok</span></td></tr>
+        <tr><td>Modelo 130 obligation</td><td>Always calculated</td><td>Professionals with ~70% or more of the previous year's income under retention don't have to file it (check the exact threshold)</td><td><span class="badge check">check</span></td></tr>
+        <tr><td>Deadlines 130</td><td>Same as 303</td><td>1–20 Apr, Jul, Oct; 4T 1–30 Jan</td><td><span class="badge ok">ok</span></td></tr>
+        <tr><td>Box numbers of the 130</td><td>c.01, c.02, c.03, c.05, c.07, c.08</td><td>Fixed by the form's Orden</td><td><span class="badge check">check</span></td></tr>
+        <tr><td>The 10 expense categories</td><td><code>CATS</code>: names, order, tooltips; box numbers of the Modelo 100 in some tooltips (transporte → c.198, manutención → c.186)</td><td>The Modelo 100 can rename, split or add categories and boxes</td><td><span class="badge check">check</span></td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel">
+      <h3>Expense limits (texts in the category ⓘ, not calculated)</h3>
+      <div class="table-scroll"><table>
+        <tr><th>Rule</th><th>In the app</th><th>2026 reference</th><th>Status</th></tr>
+        <tr><td>3 · Suministros of the home</td><td>"Límite: 30% del % de m² afectos"</td><td>30% of the proportion of the home used for the activity — not confirmed this time</td><td><span class="badge check">check</span></td></tr>
+        <tr><td>7 · Manutención</td><td>26,67 €/día España · 48,08 €/día extranjero; paid by card</td><td>Without overnight stay: 26,67 € / 48,08 €. With overnight stay: 53,34 € / 91,35 €. Paid by electronic means</td><td><span class="badge check">check</span><br>overnight limits missing</td></tr>
+        <tr><td>9 · Gastos de difícil justificación</td><td>5% of net income, max 2.000 €</td><td>5%, max 2.000 € (simplificada)</td><td><span class="badge ok">ok</span></td></tr>
+        <tr><td>10 · Amortización</td><td>"cuota anual 25%"</td><td>Simplified table: computers and software 26%, max 10 years</td><td><span class="badge check">check</span><br>25% vs 26%</td></tr>
+        <tr><td>1 · RETA</td><td>Fee typed by the user; "sin tope, deducible al 100%"</td><td>2025 tables extended for 2026 (15 tramos, about 200–590 €/month); MEI up to 0,9%</td><td><span class="badge check">check</span><br>new fee each year</td></tr>
+        <tr><td>Other "sin tope" texts</td><td>Categories 2, 4, 5, 8</td><td>Review the wording with the category list</td><td><span class="badge check">check</span></td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel">
+      <h3>Where to check</h3>
+      <ul>
+        <li>IVA rates: <a href="https://administracion.gob.es/pag_Home/Tu-espacio-europeo/derechos-obligaciones/empresas/impuestos/IVA/tipos-exenciones">administracion.gob.es — Tipos de IVA</a></li>
+        <li>Gastos de difícil justificación and the Modelo 100: <a href="https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_4_2.html">Agencia Tributaria — Estimación directa (IRPF 2025)</a></li>
+        <li>Amortization table: <a href="https://sede.agenciatributaria.gob.es/Sede/en_gb/ayuda/manuales-videos-folletos/manuales-practicos/folleto-actividades-economicas/3-impuesto-sobre-renta-personas-fisicas/3_5-estimacion-directa-simplificada/3_5_4-tabla-amortizacion-simplificada.html">Agencia Tributaria — Tabla de amortización simplificada</a></li>
+        <li>Deadlines: the Agencia Tributaria's <em>Calendario del contribuyente</em> of the year (summary: <a href="https://www.supercontable.com/boletin/G/articulos/aeat_publicado_calendario_obligaciones_tribtutarias_2026.html">Supercontable — calendario 2026</a>)</li>
+        <li>Retention 15% / 7%: <a href="https://www.legalitas.com/actualidad/irpf-nuevos-autonomos">Legálitas — retenciones de nuevos autónomos</a>; Modelo 130: <a href="https://www.legalitas.com/actualidad/modelo-130">Legálitas — Modelo 130</a></li>
+        <li>Manutención limits: <a href="https://invoo.es/es/blog/consejos/dietas-manutencion-autonomos-deducibles-2026/">Invoo — dietas 2026</a></li>
+        <li>RETA fees: Seguridad Social (Importass); summary: <a href="https://www.conversoriaecnae.es/blog/cuota-autonomos-2026-congelada-pero-con-cambio-en-mei">Conversor IAE-CNAE — cuota 2026</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 9. HOSTED API CONSIDERATIONS ================= -->
+  <section id="hosted">
+    <div class="section-head"><h2>9. Considerations for a real hosted API</h2></div>
+    <p class="section-note">Sections 1–8 describe an API that could sit in front of the existing local, file-based app. Hosting it for real — a backend other devices could call — introduces problems that don't exist in the single-file model today.</p>
+
+    <div class="panel">
+      <h3>Identity &amp; auth model</h3>
+      <p>"Authorized ledger" (Section 3) needs to become a real credential — an API key or session, since today there's nothing to log into. Whether this stays single-user is a decision to state explicitly, not leave implied.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Multi-window / concurrent-session sync</h3>
+      <p>Two open sessions editing the same data today silently overwrite each other on save. A host needs either optimistic concurrency control (reject a write if the data changed since it was read) or real-time sync — or at minimum, a way to tell a caller "this changed elsewhere" instead of losing data silently.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Complete action schema catalog</h3>
+      <p>Only <code>create_invoice</code> has a full JSON schema today. Every other action named in the Demo Mapping table needs the same treatment — parameters, types, required fields, return shape — before this is truly build-ready. The data model in Section 5 gives the field names.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Error code catalog</h3>
+      <p>Actions are required to return a machine-readable <code>code</code> on failure, but no enumerated list of codes exists yet. The alerts catalogued above are the closest thing to a starting list — several map naturally (e.g. "Formato no reconocido" → <code>invalid_import_format</code>, the Atención! messages → <code>invalid_date_format</code>, <code>date_does_not_exist</code>, warning <code>date_outside_quarter</code>).</p>
+    </div>
+
+    <div class="panel">
+      <h3>Yearly rule updates</h3>
+      <p>The Hacienda values in Section 8 are written into the code today. A hosted version should keep them in one configuration per tax year (rates, retention, limits, deadlines, categories), so updating them is a data change and past years keep the rules that applied to them.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Data migration</h3>
+      <p>Today's entire ledger lives as one JSON blob (<code>__appData</code>) embedded in the HTML file. The local version's "Exportar .json" button is the natural migration input — it already contains everything a hosted store would need, structured the way the app understands it (only the key names differ: <code>cb_2026</code> instead of <code>yr_2026</code>).</p>
+    </div>
+
+    <div class="panel">
+      <h3>Backups &amp; versioning</h3>
+      <p>Today's only backup is a manual "Exportar .json" click. A host holding real tax records needs automatic periodic backups and a version history — while the manual export likely stays available too, as a user-controlled backup independent of whatever the host does automatically.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Keeping the descriptions in sync <span class="badge quirk">real example, not hypothetical</span></h3>
+      <p>This functional design now exists in more than one place — the app itself and this page, at minimum — with nothing keeping them in sync automatically. This isn't theoretical: a caveat about a dead salary function was correctly written once, then dropped during a later rewrite, and had to be manually restored after being spotted on review. Worth deciding which format is canonical before a real build starts.</p>
+    </div>
+  </section>
+
+  <p class="footer-note">Functional design for Mi Contabilidad's API layer, extracted directly from <code>app_DEMO.html</code> (November 2026). Covers the accounting app only; the assistants are documented separately.</p>
+
+</div>
+</body>
+</html>
